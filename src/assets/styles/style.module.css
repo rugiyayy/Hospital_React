@@ -1,0 +1,38 @@
+<Box
+        as="nav"
+        className="navbar navbar-expand-lg navigation"
+        id="navbar"
+        bg="white"
+        borderBottom="1px solid #ddd"
+      >
+        <Container>
+          {/* Branding section */}
+          <Box>
+            {/* Uncomment the following lines once you have the logo image */}
+            {/* <Link href="index.html">
+              <Image src={require("../assets/img/logo.png")} alt="Logo" maxH="50px" />
+            </Link> */}
+          </Box>
+
+          {/* Navbar toggler */}
+          <Button
+            className="navbar-toggler collapsed"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarmain"
+            aria-controls="navbarmain"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <Icon className="icofont-navigation-menu" />
+          </Button>
+
+          {/* Navbar items */}
+          <Collapse in={true} id="navbarmain">
+            <Flex as="ul" className="navbar-nav ml-auto" listStyleType="none">
+
+              {/* Add other menu items here using ListItems and Links */}
+            </Flex>
+          </Collapse>
+        </Container>
+      </Box>
