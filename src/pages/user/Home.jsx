@@ -1,12 +1,13 @@
+import styles from "../../assets/styles/home.module.scss"
+
 import { Section } from "@react-email/components";
 import React from "react";
-import styles from "../assets/styles/home.module.scss";
-import serviceImg1 from "../assets/img/service/service-1.jpg";
-import serviceImg2 from "../assets/img/service/service-2.jpg";
-import serviceImg3 from "../assets/img/service/service-3.jpg";
-import serviceImg4 from "../assets/img/service/service-4.jpg";
-import serviceImg5 from "../assets/img/service/service-6.jpg";
-import serviceImg6 from "../assets/img/service/service-8.jpg";
+import serviceImg1 from "../../assets/img/service/service-1.jpg"
+import serviceImg2 from "../../assets/img/service/service-2.jpg";
+import serviceImg3 from "../../assets/img/service/service-3.jpg";
+import serviceImg4 from "../../assets/img/service/service-4.jpg";
+import serviceImg5 from "../../assets/img/service/service-6.jpg";
+import serviceImg6 from "../../assets/img/service/service-8.jpg";
 
 import {
   Box,
@@ -33,13 +34,8 @@ import {
   faHeartbeat,
   faTooth,
 } from "@fortawesome/free-solid-svg-icons";
-import { Helper } from "./Helper";
-
-const colors = {
-  primary: "#e12454", //pink
-  secondary: "#223a66", //blue
-  paragraph: "#40709d", //lightBlue
-};
+import { Helper } from "../../components/Helper";
+import { colors } from "../../components/Constants";
 
 const services = [
   {
@@ -296,14 +292,14 @@ export default function Home() {
         <Container maxW="72%">
           <Flex w="100%" alignItems="center" justifyContent="space-between">
             <Box className={styles.about_img} width="31%">
-              <Img src={require("../assets/img/about/img-1.jpg")} alt="" />
-              <Img src={require("../assets/img/about/img-2.jpg")} alt="" />
+              <Img src={require("../../assets/img/about/img-1.jpg")} alt="" />
+              <Img src={require("../../assets/img/about/img-2.jpg")} alt="" />
             </Box>
 
             <Box color="#e12454" width="31%">
               <Img
                 w="100%"
-                src={require("../assets/img/about/img-3.jpg")}
+                src={require("../../assets/img/about/img-3.jpg")}
                 alt=""
               />
             </Box>

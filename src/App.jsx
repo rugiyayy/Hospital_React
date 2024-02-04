@@ -4,8 +4,9 @@ import SignUp from "./components/SignUp";
 import SignIn from "./components/SignIn";
 
 import Layout from "./layouts/Layouts";
-import Home from "./components/Home";
-import Department from "./components/Department";
+import Home from "./pages/user/Home";
+import Department from "./pages/user/Department";
+import Doctor from "./pages/user/Doctor";
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/" element={<Home />} />
             <Route path="/department" element={<Department />} />
-
+            <Route path="/doctors" element={<Doctor/>} />
           </Route>
         </Routes>
       </Router>

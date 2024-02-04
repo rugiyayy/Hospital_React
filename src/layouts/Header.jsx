@@ -16,8 +16,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router-dom";
 import Logo from "../assets/img/doctor-stethoscope-svgrepo-com (1).svg";
-import SignIn from "./SignIn";
-import SignInModal from "./SignInModal";
+import SignIn from "../components/SignIn";
+import SignInModal from "../components/SignInModal";
 const Header = () => {
   return (
     <header>
@@ -29,7 +29,7 @@ const Header = () => {
         py="2"
         boxShadow="0 1px 2px rgba(0, 0, 0, 0.05)"
       >
-        <div className={syles.container} backgroundColor="blue">
+        <div className={syles.container} >
           <Flex width="100%" justifyContent="space-between" align="center">
             <List
               display="flex"
@@ -46,7 +46,7 @@ const Header = () => {
                   alignItems="center"
                   gap="8px"
                 >
-                  <FontAwesomeIcon marginRight="12px" icon={faCommentDots} />
+                  <FontAwesomeIcon  icon={faCommentDots} />
 
                   <Text
                     fontWeight="600"
@@ -109,9 +109,9 @@ const Header = () => {
             justifyContent="space-between"
             align="center"
           >
-            <Link to="/">
+            <NavLink to="/">
               <img width="20%" src={Logo} />
-            </Link>
+            </NavLink>
 
             <HStack>
               <List
@@ -124,7 +124,7 @@ const Header = () => {
               >
                 <ListItem className={syles.nav_listItem}>
                   <NavLink
-                    className={({ isActive }) => (isActive ? "active" : "")}
+                    className={({ isActive }) => (isActive ? syles.active : "")}
                     to={"/"}
                   >
                     Home
@@ -132,7 +132,7 @@ const Header = () => {
                 </ListItem>
                 {/* <ListItem className={syles.nav_listItem}>
                   <NavLink
-                    className={({ isActive }) => (isActive ? "active" : "")}
+                    className={({ isActive }) => (isActive ? syles.active : "")}
                     to={"/About"}
                   >
                     About
@@ -140,7 +140,7 @@ const Header = () => {
                 </ListItem>
                 <ListItem className={syles.nav_listItem}>
                   <NavLink
-                    className={({ isActive }) => (isActive ? "active" : "")}
+                    className={({ isActive }) => (isActive ? syles.active : "")}
                     to={"/Services"}
                   >
                     Services
@@ -148,7 +148,7 @@ const Header = () => {
                 </ListItem> */}
                 <ListItem className={syles.nav_listItem}>
                   <NavLink
-                    className={({ isActive }) => (isActive ? "active" : "")}
+                    className={({ isActive }) => (isActive ? syles.active : "")}
                     to={"/Department"}
                   >
                     Department
@@ -156,16 +156,16 @@ const Header = () => {
                 </ListItem>
                 <ListItem className={syles.nav_listItem}>
                   <NavLink
-                    className={({ isActive }) => (isActive ? "active" : "")}
+                    className={({ isActive }) => (isActive ? syles.active : "")}
                     to={"/Doctors"}
                   >
-                    Doctor
+                    Doctors
                   </NavLink>
                 </ListItem>
 
                 <ListItem className={syles.nav_listItem}>
                   <NavLink
-                    className={({ isActive }) => (isActive ? "active" : "")}
+                    className={({ isActive }) => (isActive ? syles.active : "")}
                     to={"/Contact"}
                   >
                     Contact
@@ -173,7 +173,7 @@ const Header = () => {
                 </ListItem>
                 <ListItem className={syles.nav_listItem}>
                   <NavLink
-                    className={({ isActive }) => (isActive ? "active" : "")}
+                    className={({ isActive }) => (isActive ? syles.active : "")}
                     to={"/Appointment"}
                   >
                     Appointment
