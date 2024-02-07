@@ -9,19 +9,19 @@ const api = Axios.create({
 });
 
 class HttpClient {
-  get(url, configs = null) {
+  get(url, configs=null) {
     return api.get(url, configs);
   }
 
-  post(url, data, configs = null) {
+  post(url, data, configs=null) {
     return api.post(url, data, configs);
   }
 
-  put(url, data = null, configs = null) {
+  put(url, data=null, configs=null) {
     return api.put(url, data, configs);
   }
 
-  delete(url, config = null) {
+  delete(url, config=null) {
     return api.delete(url, config);
   }
 }

@@ -38,7 +38,7 @@ const Header = () => {
               gap="36px"
             >
               <ListItem>
-                <Link
+                <NavLink
                   _hover={{ textDecoration: "none" }}
                   href="mailto:yolchiyeva.y1@gmail.com"
                   display="flex"
@@ -55,7 +55,7 @@ const Header = () => {
                     {" "}
                     support@novena.com
                   </Text>
-                </Link>
+                </NavLink>
               </ListItem>
               <ListItem
                 display="flex"
@@ -71,7 +71,7 @@ const Header = () => {
             <Flex justify="flex-end" alignItems="center" gap="32px">
               <Text fontWeight="bold" fontSize="md" mr="2">
                 Call Now :
-                <Link
+                <NavLink
                   _hover={{
                     textDecoration: "none",
                     color: "black",
@@ -83,7 +83,7 @@ const Header = () => {
                 >
                   {" "}
                   823-4565-13456
-                </Link>
+                </NavLink>
               </Text>
 
               <Box
