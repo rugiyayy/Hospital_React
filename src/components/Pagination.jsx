@@ -18,7 +18,7 @@ const Pagination = ({ filteredData, perPage, page, setPage }) => {
   };
 
   return (
-    <ButtonGroup margin="1rem 0">
+    <ButtonGroup >
       <Button
         _active={{
           bg: "#dddfe2",

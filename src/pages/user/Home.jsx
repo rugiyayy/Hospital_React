@@ -1,8 +1,8 @@
-import styles from "../../assets/styles/home.module.scss"
+import styles from "../../assets/styles/home.module.scss";
 
 import { Section } from "@react-email/components";
-import React from "react";
-import serviceImg1 from "../../assets/img/service/service-1.jpg"
+import React, { useState } from "react";
+import serviceImg1 from "../../assets/img/service/service-1.jpg";
 import serviceImg2 from "../../assets/img/service/service-2.jpg";
 import serviceImg3 from "../../assets/img/service/service-3.jpg";
 import serviceImg4 from "../../assets/img/service/service-4.jpg";
@@ -22,7 +22,7 @@ import {
   Text,
   extendTheme,
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBrain,
@@ -36,7 +36,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Helper } from "../../components/Helper";
 import { colors } from "../../components/Constants";
-
+import SignInModal from "../../components/SignInModal";
+import { useSelector } from "react-redux";
+import { Redirect } from "react-router-dom";
+import useSignInModal from "../../hooks/useSignInModal";
 const services = [
   {
     icon: faCalendarCheck,
@@ -160,6 +163,22 @@ export default function Home() {
       //     textTransform: "uppercase",
       //     letterSpacing: "1px",
       //   },
+
+      a: {
+        fontSize: "14px",
+        fontWeight: "700",
+        color: "white",
+        bg: "#e12454",
+        marginTop: "12px",
+        borderRadius: "20px",
+        padding: "24px 16px",
+        _hover: {
+          bg: "#223a66",
+        },
+        transition: ".6s ease",
+        textTransform: "uppercase",
+        letterSpacing: "1px",
+      },
       flex: {
         alignItems: "start",
         flexDirection: "column",
@@ -167,6 +186,11 @@ export default function Home() {
       },
     },
   });
+
+  const userName = useSelector((state) => state.account.userName);
+  console.log("Current userName:", userName);
+  const { isOpen, onClose } = useSignInModal();
+
   return (
     <main>
       <Section as="banner" className={styles.banner}>
@@ -195,14 +219,22 @@ export default function Home() {
               placeat.
             </Text>
             <div>
-              <Link to="/appointment">
-                <Helper
-                  text="Make appointment"
-                  bgColor={colors.primary}
-                  bgHover={colors.secondary}
-                  fontSize="16px"
-                />
-              </Link>
+              {!userName ? (
+                  <SignInModal
+                    bg={"#e12454"}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    name={"Make Appointment"}
+                    color="white"
+                    hoverBg="#223a66"
+                    hoverColor="white"
+                  />
+           
+              ) : (
+                <Button sx={theme.textStyles.a}>
+                  <Link to="/appointment">Make Appointment</Link>
+                </Button>
+              )}
             </div>
           </Flex>
         </Container>
@@ -227,14 +259,22 @@ export default function Home() {
                   Get ALl time support for emergency.We have introduced the
                   principle of family medicine.
                 </Text>
-                <Link to="/appointment">
-                  <Helper
-                    text="Make appointment"
-                    bgColor={colors.secondary}
-                    bgHover={colors.primary}
-                    fontSize="12px"
+                {!userName ? (
+                  <SignInModal
+                    bg={"#e12454"}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    name={"Make Appointment"}
+                    color="white"
+                    hoverBg="#223a66"
+                    hoverColor="white"
                   />
-                </Link>
+           
+              ) : (
+                <Button sx={theme.textStyles.a}>
+                  <Link to="/appointment">Make Appointment</Link>
+                </Button>
+              )}
               </Flex>
             </Box>
 
@@ -482,14 +522,22 @@ export default function Home() {
             </Box>
 
             <div>
-              <Link to="/appointment">
-                <Helper
-                  text="Get appointment"
-                  bgColor={colors.primary}
-                  bgHover={colors.secondary}
-                  fontSize="12px"
-                />
-              </Link>
+            {!userName ? (
+                  <SignInModal
+                    bg={"#e12454"}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    name={"Make Appointment"}
+                    color="white"
+                    hoverBg="#223a66"
+                    hoverColor="white"
+                  />
+           
+              ) : (
+                <Button sx={theme.textStyles.a}>
+                  <Link to="/appointment">Make Appointment</Link>
+                </Button>
+              )}
             </div>
           </Box>
         </Container>

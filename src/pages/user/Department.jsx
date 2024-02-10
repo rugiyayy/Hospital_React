@@ -178,13 +178,13 @@ const endIndex =
             ))}
           </SimpleGrid>
 
-          <Pagination
+          <Box margin="3rem 0" textAlign="center"><Pagination
                   filteredData={filteredData}
                   perPage={perPage}
                   page={page}
                   setPage={setPage}
                 />
-             
+             </Box>
         </Container>
       </Section>
     </main>

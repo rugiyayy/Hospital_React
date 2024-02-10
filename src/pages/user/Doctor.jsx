@@ -19,6 +19,7 @@ import {
   Spinner,
   Stack,
   Text,
+  extendTheme,
 } from "@chakra-ui/react";
 
 import React, { useEffect, useState } from "react";
@@ -33,9 +34,36 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleFilter } from "../../redux/slices/selectedFiltersSlice";
 import Pagination from "../../components/Pagination";
 import Errors from "../../components/DoctorPageErrorMessages.jsx";
+import Banner2 from "../doctor_page/Banner2.jsx";
+import useSignInModal from "../../hooks/useSignInModal.js";
+import SignInModal from "../../components/SignInModal.jsx";
+
+const theme = extendTheme({
+  textStyles: {
+    a: {
+      fontSize: "14px",
+      fontWeight: "700",
+      color: "white",
+      bg: "#e12454",
+      marginTop: "12px",
+      borderRadius: "20px",
+      padding: "24px 16px",
+      _hover: {
+        bg: "#223a66",
+      },
+      transition: ".6s ease",
+      textTransform: "uppercase",
+      letterSpacing: "1px",
+    },
+  },
+});
 
 //! start
 export default function Doctor() {
+  const userName = useSelector((state) => state.account.userName);
+
+  const { isOpen, onClose } = useSignInModal();
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -43,9 +71,6 @@ export default function Doctor() {
 
   const dispatch = useDispatch();
   const selectedFiltersRedux = useSelector((state) => state.selectedFilters);
-
-
-
 
   const [page, setPage] = useState(1);
   const [perPage] = useState(9);
@@ -55,7 +80,7 @@ export default function Doctor() {
     return httpClient.get(`/doctor`);
   };
   const getTypes = () => {
-    return httpClient.get("/doctortype");
+    return httpClient.get("/doctorType");
   };
   const getDepartments = () => {
     return httpClient.get("/department");
@@ -86,15 +111,15 @@ export default function Doctor() {
     urlParams.delete("doctorType");
     urlParams.delete("department");
 
-    selectedFilters.selectedDoctorTypes.forEach((type) =>
+    selectedFiltersRedux.selectedDoctorTypes.forEach((type) =>
       urlParams.append("doctorType", type)
     );
-    selectedFilters.selectedDepartments.forEach((department) =>
+    selectedFiltersRedux.selectedDepartments.forEach((department) =>
       urlParams.append("department", department)
     );
     urlParams.set("_page", page.toString());
     navigate(`?${urlParams.toString()}`);
-  }, [selectedFilters, location.search, navigate, page]);
+  }, [selectedFiltersRedux, location.search, navigate, page]);
   //#endregion
 
   //#region //!UseQuery Doctor, DocType, Department
@@ -102,14 +127,10 @@ export default function Doctor() {
     isLoading: doctorLoading,
     data: doctor,
     error: doctorError,
-  } = useQuery(
-    ["doctor"],
-    () => getDoctors(),
-    {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-    }
-  );
+  } = useQuery(["doctor"], () => getDoctors(), {
+    refetchOnWindowFocus: false,
+    keepPreviousData: true,
+  });
   const {
     isLoading: doctorTypeLoading,
     data: doctorType,
@@ -153,14 +174,14 @@ export default function Doctor() {
       .includes(searchTerm.toLowerCase());
 
     const typeMatches =
-      selectedFilters.selectedDoctorTypes.length === 0 ||
-      selectedFilters.selectedDoctorTypes.includes(
+      selectedFiltersRedux.selectedDoctorTypes.length === 0 ||
+      selectedFiltersRedux.selectedDoctorTypes.includes(
         doctor?.doctorTypeName?.toLowerCase()
       );
 
     const departmentMatches =
-      selectedFilters.selectedDepartments.length === 0 ||
-      selectedFilters.selectedDepartments.includes(
+      selectedFiltersRedux.selectedDepartments.length === 0 ||
+      selectedFiltersRedux.selectedDepartments.includes(
         doctor?.departmentName?.toLowerCase()
       );
 
@@ -254,7 +275,6 @@ export default function Doctor() {
             </Text>
           </Box>
           {doctor?.data?.length > 0 && (
-
             // {/* //! Seacrh Input */}
 
             <InputGroup w="50%" margin="0 auto">
@@ -270,22 +290,11 @@ export default function Doctor() {
               />
             </InputGroup>
           )}
-          <Box
-            w="100%"
-            color={colors.primary}
-            fontWeight="700"
-            fontSize="28px"
-            textAlign="center"
-            margin="0 auto"
-          >
-            {doctor == null && doctorError != null && (
-              <Text as="h1">Failed to get doctors</Text>
-            )}
-          </Box>
+
           {/* //!   MAIN PART */}
           <Box>
             <Grid
-              margin="3rem -1rem"
+              margin="3rem -1rem 0rem"
               templateRows="repeat(1, 1fr)"
               templateColumns="repeat(4, 1fr)"
               gap={4}
@@ -306,7 +315,10 @@ export default function Doctor() {
                   <Stack spacing={5} direction="column">
                     <FormControl
                       isDisabled={
-                        doctorLoading || doctorError || doctor?.length === 0
+                        doctorLoading ||
+                        doctorError ||
+                        doctor?.length === 0 ||
+                        doctor?.data?.length === 0
                       }
                       key={type.id}
                     >
@@ -314,6 +326,9 @@ export default function Doctor() {
                         fontSize="50px"
                         padding="2px 0"
                         _checked={{ color: colors.primary }}
+                        isChecked={selectedFiltersRedux.selectedDoctorTypes.includes(
+                          type.name.toLowerCase()
+                        )}
                         value={type.name.toLowerCase()}
                         checked={selectedFiltersRedux.selectedDoctorTypes.includes(
                           type.name.toLowerCase()
@@ -364,13 +379,19 @@ export default function Doctor() {
                     <Stack spacing={5} direction="column">
                       <FormControl
                         isDisabled={
-                          doctorLoading || doctorError || doctor?.length === 0
+                          doctor?.data?.length === 0 ||
+                          doctorLoading ||
+                          doctorError ||
+                          doctor?.length === 0
                         }
                         key={dep.id}
                       >
                         <Checkbox
                           w="100%"
                           padding="2px 0"
+                          isChecked={selectedFiltersRedux.selectedDepartments.includes(
+                            dep.name.toLowerCase()
+                          )}
                           _checked={{ color: colors.primary }}
                           margin="0 auto"
                           fontSize="50px"
@@ -409,10 +430,10 @@ export default function Doctor() {
               </GridItem>
               {filteredData &&
                 filteredData?.slice(startIndex, endIndex).map((doctor, i) => (
-                //   {/*//! Doctor Card */}
+                  //   {/*//! Doctor Card */}
                   <GridItem colSpan={1}>
                     {" "}
-                    <Card height="56vh" key={doctor.id}>
+                    <Card margin="12px 0" height="54vh" key={doctor.id}>
                       <CardHeader>
                         <NavLink color={colors.paragraph} to="/">
                           {doctor.docPhoto?.photoPath != null && (
@@ -451,30 +472,30 @@ export default function Doctor() {
                           {doctor.fullName}
                         </Text>
                       </CardBody>
-                      <CardFooter padding="12px 24px">
-                        <Button
-                          transition=".6s"
-                          _hover={{
-                            background: colors.paragraph,
-                            color: "white",
-                          }}
-                        >
-                          <Link to="/">make an appointment </Link>
-                        </Button>
+                      <CardFooter margin="0 auto" padding="12px 24px">
+                        
+                          {!userName ? (
+                            <SignInModal
+                              bg={"#e12454"}
+                              isOpen={isOpen}
+                              onClose={onClose}
+                              name={"Make Appointment"}
+                              color="white"
+                              hoverBg="#223a66"
+                              hoverColor="white"
+                            />
+                          ) : (
+                            <Button sx={theme.textStyles.a}>
+                              <Link to="/appointment">Make Appointment</Link>
+                            </Button>
+                          )}
+                      
                       </CardFooter>
                     </Card>
                   </GridItem>
                 ))}
-              {filteredData && filteredData.length > 0 && (
-    //    {/*         // !Pagination  */}
-                <Pagination
-                  filteredData={filteredData}
-                  perPage={perPage}
-                  page={page}
-                  setPage={setPage}
-                />
-              )}
-                 {/*          //! Error Messages */}
+
+              {/*          //! Error Messages */}
               <Errors
                 doctorType={doctorType}
                 doctorTypeError={doctorTypeError}
@@ -490,9 +511,30 @@ export default function Doctor() {
                 searchTerm={searchTerm}
               />
             </Grid>
+            <Box
+              margin="0 auto 2rem"
+              justifyContent="center"
+              alignItems="center"
+              display="flex"
+            >
+              {" "}
+              {filteredData && filteredData.length > 0 && (
+                //    {/*         // !Pagination  */}
+
+                <Pagination
+                  filteredData={filteredData}
+                  perPage={perPage}
+                  page={page}
+                  setPage={setPage}
+                />
+              )}
+            </Box>
           </Box>
         </Container>
       </Section>
+      <Box margin="5rem 0" padding="3rem 0" className={styles.banner_2}>
+        <Banner2 />
+      </Box>
     </main>
   );
 }

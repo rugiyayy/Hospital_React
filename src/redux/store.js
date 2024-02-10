@@ -13,16 +13,18 @@ import storage from "redux-persist/lib/storage";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import selectedFiltersSlice from "./slices/selectedFiltersSlice";
 import selectedPageSlice from "./slices/selectedPageSlice";
+import accountSlice from "./slices/accountSlice";
 
 const reducers = combineReducers({
   selectedFilters: selectedFiltersSlice.reducer,
   selectedPage: selectedPageSlice.reducer,
+  account: accountSlice.reducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["selectedFilters","selectedPage"],
+  whitelist: ["selectedFilters","selectedPage", "account"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

@@ -2,6 +2,7 @@ import { Button, extendTheme } from "@chakra-ui/react";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Helper(props) {
   const theme = extendTheme({
@@ -25,7 +26,7 @@ function Helper(props) {
   });
   return (
     <Button gap="16px" sx={theme.textStyles.a}>
-      {props.text}
+      <Link to="/appointment">{props.text}</Link>
       <FontAwesomeIcon icon={faChevronRight} />
     </Button>
   );

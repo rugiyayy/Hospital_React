@@ -18,7 +18,11 @@ import { NavLink } from "react-router-dom";
 import Logo from "../assets/img/doctor-stethoscope-svgrepo-com (1).svg";
 import SignIn from "../components/SignIn";
 import SignInModal from "../components/SignInModal";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutAction } from "../redux/slices/accountSlice";
 const Header = () => {
+  const { userName } = useSelector((x) => x.account);
+  const dispatch = useDispatch();
   return (
     <header>
       <Box
@@ -29,7 +33,7 @@ const Header = () => {
         py="2"
         boxShadow="0 1px 2px rgba(0, 0, 0, 0.05)"
       >
-        <div className={syles.container} >
+        <div className={syles.container}>
           <Flex width="100%" justifyContent="space-between" align="center">
             <List
               display="flex"
@@ -38,13 +42,12 @@ const Header = () => {
               gap="36px"
             >
               <ListItem>
-                <NavLink
+                <Link alignItems="center"
                   _hover={{ textDecoration: "none" }}
                   href="mailto:yolchiyeva.y1@gmail.com"
                   display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  gap="8px"
+                  gap="10px"
+                  
                 >
                   <FontAwesomeIcon  icon={faCommentDots} />
 
@@ -55,7 +58,9 @@ const Header = () => {
                     {" "}
                     support@novena.com
                   </Text>
-                </NavLink>
+
+
+                </Link>
               </ListItem>
               <ListItem
                 display="flex"
@@ -94,7 +99,15 @@ const Header = () => {
               >
                 <FontAwesomeIcon icon={faUser} />
 
-                <SignInModal />
+                <SignInModal name={"SignIn"} />
+                {userName ? (
+                  <Button
+                    onClick={() => dispatch(logoutAction())}
+                   
+                  >
+                    Log Out
+                  </Button>
+                ) : null}
               </Box>
             </Flex>
           </Flex>

@@ -5,6 +5,8 @@ import {
   FormControl,
   FormLabel,
   Input,
+  InputGroup,
+  InputRightElement,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -15,24 +17,29 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useRef } from "react";
 import { NavLink } from "react-router-dom";
+import useSignInModal from "../hooks/useSignInModal";
+import { useSelector } from "react-redux";
 
-export default function SignInModal() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const initialRef = React.useRef(null);
-  const finalRef = React.useRef(null);
-
+export default function SignInModal(prop) {
+  const { onOpen, isLoading, onClose, formik, isOpen } = useSignInModal();
+  const { userName } = useSelector((x) => x.account);
+  const [show, setShow] = React.useState(false)
+  const handleClick = () => setShow(!show)
   return (
     <>
-      <Button onClick={onOpen}>Sign In</Button>
-      <Modal
-        initialFocusRef={initialRef}
-        finalFocusRef={finalRef}
-        isOpen={isOpen}
-        onClose={onClose}
-      >
+      {userName ?? (
+        <Button
+          backgroundColor={prop.bg}
+          color={prop.color}
+          _hover={{ bg: prop.hoverBg, color: prop.hoverColor }}
+          onClick={onOpen}
+        >
+          {prop.name}
+        </Button>
+      )}
+      <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader textAlign="center">
@@ -45,12 +52,39 @@ export default function SignInModal() {
           <ModalBody pb={6}>
             <FormControl>
               <FormLabel>User name</FormLabel>
-              <Input type="mail" ref={initialRef} placeholder="User name" />
+              <Input
+                onChange={formik.handleChange}
+                value={formik.values.userName}
+                name="userName"
+                type="mail"
+                placeholder="Your Email Address"
+              />
+              {formik.errors.userName && formik.touched.userName && (
+                <span style={{ color: "red" }}>{formik.errors.userName}</span>
+              )}
             </FormControl>
 
             <FormControl mt={4}>
               <FormLabel>Password</FormLabel>
-              <Input type="password" placeholder="Password" />
+
+              <InputGroup size="md">
+                <Input
+                  name="password"
+                  onChange={formik.handleChange}
+                  value={formik.values.password}
+                  pr="4.5rem"
+                  type={show ? "text" : "password"}
+                  placeholder="Enter password"
+                />
+                <InputRightElement width="4.5rem">
+                  <Button h="1.75rem" size="sm" onClick={handleClick}>
+                    {show ? "Hide" : "Show"}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+              {formik.errors.password && formik.touched.password && (
+                <span style={{ color: "red" }}>{formik.errors.password}</span>
+              )}
             </FormControl>
           </ModalBody>
 
@@ -59,6 +93,8 @@ export default function SignInModal() {
               background="green"
               _hover={{ backgroundColor: "green.500" }}
               colorScheme="blue"
+              isLoading={isLoading}
+              onClick={formik.handleSubmit}
               mr={3}
             >
               Sign In
@@ -67,7 +103,9 @@ export default function SignInModal() {
             <Flex gap="12px">
               Don't have an account?
               <NavLink to="/signup" as="span">
-                <Text onClick={onClose}>Sign up</Text>
+                <Button variant="link" onClick={onClose}>
+                  Sign up
+                </Button>
               </NavLink>
             </Flex>
           </ModalFooter>
