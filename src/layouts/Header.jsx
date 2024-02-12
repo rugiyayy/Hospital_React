@@ -42,14 +42,14 @@ const Header = () => {
               gap="36px"
             >
               <ListItem>
-                <Link alignItems="center"
+                <Link
+                  alignItems="center"
                   _hover={{ textDecoration: "none" }}
                   href="mailto:yolchiyeva.y1@gmail.com"
                   display="flex"
                   gap="10px"
-                  
                 >
-                  <FontAwesomeIcon  icon={faCommentDots} />
+                  <FontAwesomeIcon icon={faCommentDots} />
 
                   <Text
                     fontWeight="600"
@@ -58,8 +58,6 @@ const Header = () => {
                     {" "}
                     support@novena.com
                   </Text>
-
-
                 </Link>
               </ListItem>
               <ListItem
@@ -101,12 +99,13 @@ const Header = () => {
 
                 <SignInModal name={"SignIn"} />
                 {userName ? (
-                  <Button
-                    onClick={() => dispatch(logoutAction())}
-                   
-                  >
-                    Log Out
-                  </Button>
+                  <>
+                    <NavLink to="/contact">Your Profile</NavLink>
+
+                    <Button onClick={() => dispatch(logoutAction())}>
+                      Log Out
+                    </Button>
+                  </>
                 ) : null}
               </Box>
             </Flex>

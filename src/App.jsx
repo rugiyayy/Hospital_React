@@ -8,6 +8,8 @@ import Home from "./pages/user/Home";
 import Department from "./pages/user/Department";
 import Doctor from "./pages/user/Doctor";
 import Appointment from "./pages/user/Appointment";
+import AppointmentDetails from "./pages/user/AppointmentDetails";
+import Contact from "./pages/user/Contact";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
             <Route path="/department" element={<Department />} />
             <Route path="/doctors" element={<Doctor/>} />
             <Route path="/appointment" element={<Appointment/>} />
+            <Route path="/appointment-details" element={<AppointmentDetails/>} />
+            <Route path="/contact" element={<Contact/>} />
 
           </Route>
         </Routes>

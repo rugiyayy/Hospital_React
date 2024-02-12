@@ -1,7 +1,7 @@
 import styles from "../../assets/styles/home.module.scss";
 
 import { Section } from "@react-email/components";
-import React, { useState } from "react";
+import React from "react";
 import serviceImg1 from "../../assets/img/service/service-1.jpg";
 import serviceImg2 from "../../assets/img/service/service-2.jpg";
 import serviceImg3 from "../../assets/img/service/service-3.jpg";
@@ -22,7 +22,7 @@ import {
   Text,
   extendTheme,
 } from "@chakra-ui/react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBrain,
@@ -34,11 +34,9 @@ import {
   faHeartbeat,
   faTooth,
 } from "@fortawesome/free-solid-svg-icons";
-import { Helper } from "../../components/Helper";
 import { colors } from "../../components/Constants";
 import SignInModal from "../../components/SignInModal";
 import { useSelector } from "react-redux";
-import { Redirect } from "react-router-dom";
 import useSignInModal from "../../hooks/useSignInModal";
 const services = [
   {

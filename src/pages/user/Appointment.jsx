@@ -1,25 +1,34 @@
 import {
   Container,
-  Box,
   Flex,
   Text,
-  Heading,
   FormControl,
   Input,
   Button,
   Select,
-  HStack,
-  Textarea,
   extendTheme,
+  useToast,
 } from "@chakra-ui/react";
 import { Section } from "@react-email/components";
-import React from "react";
-import styles from "../../assets/styles/appointment.module.scss";
-import { faHeadset } from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useRef, useEffect } from "react";
+import { faAngleRight, faHeadset } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { colors } from "../../components/Constants";
+import { httpClient } from "../../utils/httpClient";
+import { useFormik } from "formik";
+import { useSelector } from "react-redux";
+import { useQuery } from "react-query";
+import { appointmentSchema } from "../../validations/appointmentSchema";
+import {useLocation, useNavigate } from "react-router-dom";
+import AppointmentRepetedParts, {
+  Spinner1,
+} from "../../components/AppointmentRepetedParts";
+import useSignInModal from "../../hooks/useSignInModal";
+import SignInModal from "../../components/SignInModal";
 
 function Appointment() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const theme = extendTheme({
     textStyles: {
       a: {
@@ -39,39 +48,93 @@ function Appointment() {
       },
     },
   });
+
+  const selectRef = useRef();
+  const [isLoading, setIsLoading] = useState(false);
+  const { token, userName } = useSelector((state) => state.account);
+  const toast = useToast();
+  const formik = useFormik({
+    initialValues: {
+      selectedDate: "",
+      fullName: "",
+      doctorId: null,
+    },
+    validationSchema: appointmentSchema,
+    onSubmit: async (values) => {
+      try {
+        setIsLoading(true);
+        const response = await httpClient.get(
+          "/Appointment/AvailableTimeSlots",
+          {
+            params: {
+              selectedDate: values.selectedDate,
+              doctorId: values.doctorId,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("Available time slots:", response.data);
+        navigate(
+          `/appointment-details?doctorId=${values.doctorId}&selectedDate=${values.selectedDate}`
+        );
+      } catch (error) {
+        console.error("Error fetching available time slots:", error);
+        toast({
+          title: "Error",
+          description: error.response.data|| "Uppss something went wrong .. check your connection or logout and sign in again",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+  });
+
+  // useEffect(() => {
+  //   const urlParams = new URLSearchParams(location.search);
+  //   urlParams.set("doctorId", formik.values.doctorId);
+  //   urlParams.set("selectedDate", formik.values.selectedDate);
+
+  //   navigate(`?${urlParams.toString()}`);
+  // }, [formik.values.doctorId, formik.values.selectedDate]);
+
+
+  const { isOpen, onClose } = useSignInModal();
+   const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const next30Days = new Date();
+  next30Days.setDate(next30Days.getDate() + 30);
+
+  const getDoctors = (token) => {
+    return httpClient.get("/doctor", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  };
+  const {
+    isLoading: doctorLoading,
+    data: doctor,
+    error: doctorError,
+  } = useQuery(["doctor"], () => getDoctors(), {
+    refetchOnWindowFocus: false,
+  });
+
+ 
+
+  if (doctorLoading) {
+    return <Spinner1 />;
+  }
+
   return (
     <main>
-      <Section>
-        <Flex
-          w="100%"
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="column"
-          className={styles.banner}
-          margin="22px 0"
-          backgroundColor="#fff"
-          bgRepeat="no-repeat"
-          bgSize="cover"
-          minHeight="330px"
-          width="100%"
-          maxW="100%"
-          position="relative"
-          zIndex="100"
-        >
-          <Box
-            zIndex="-1"
-            // className={styles.overlay}
-            width="100%"
-            height="100%"
-            position="absolute"
-            opacity="0.9"
-            bgColor="#223a66"
-          />
-          <Text color="white" as="b" fontWeight="700" fontSize="5xl">
-            Appointment
-          </Text>
-        </Flex>
-      </Section>
+      <AppointmentRepetedParts />
 
       <Section>
         <Container maxW="72%">
@@ -111,23 +174,80 @@ function Appointment() {
               </Text>
 
               <FormControl gap="20px">
-                <HStack margin="20px 0" spacing={8}>
+                <Flex justifyContent="space-between">
+                  {formik.errors.doctorId && formik.touched.doctorId && (
+                    <Text color="red" width="58%">
+                      {formik.errors.doctorId}
+                    </Text>
+                  )}
+                  {formik.errors.selectedDate &&
+                    formik.touched.selectedDate && (
+                      <Text color="red" width="38%">
+                        {formik.errors.selectedDate}
+                      </Text>
+                    )}
+                </Flex>
+                <Flex
+                  alignItems="center"
+                  margin="20px 0"
+                  justifyContent="space-between"
+                >
                   <Select
-                    fontSize="17px"
-                    size="md"
-                    w="60%"
-                    placeholder="Select Doctor"
+                    width="58%"
+                    ref={selectRef}
+                    name="doctorId"
+                    value={formik.values.doctorId}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   >
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
+                    <option selected disabled value="default">
+                      Select Doctor
+                    </option>
+                    {doctor?.data?.map((x, i) => {
+                      return (
+                        <option key={i} value={x.id}>
+                          {x.fullName}
+                        </option>
+                      );
+                    })}
                   </Select>
-                <Input w="40%" size="md" type="date"/>
-                </HStack>
 
-                <Textarea marginBottom="14px" placeholder="Symptoms..." />
+                  <Input
+                    w="38%"
+                    size="md"
+                    type="date"
+                    name="selectedDate"
+                    value={formik.values.selectedDate}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    min={tomorrow.toISOString().split("T")[0]}
+                    max={next30Days.toISOString().split("T")[0]}
+                  />
+                </Flex>
 
-                <Button sx={theme.textStyles.a}>Make an appointment</Button>
+                {!userName ? (
+                  <SignInModal
+                    bg={"#e12454"}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    name={"Make Appointment"}
+                    color="white"
+                    hoverBg="#223a66"
+                    hoverColor="white"
+                  />
+                ) : (
+                  <Button
+                    gap="10px"
+                    justifyContent="center"
+                    alignItems="center"
+                    onClick={formik.handleSubmit}
+                    isLoading={isLoading}
+                    sx={theme.textStyles.a}
+                  >
+                    <Text> Click to see Aviable times</Text>
+                    <FontAwesomeIcon fontSize="28px" icon={faAngleRight} />
+                  </Button>
+                )}
               </FormControl>
             </Flex>
           </Flex>
