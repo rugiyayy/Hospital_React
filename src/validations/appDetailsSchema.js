@@ -8,5 +8,5 @@ export const appDetailsSchema = Yup.object().shape({
   doctorId: Yup.number().required("Please select a doctor."),
   description: Yup.string()
     .required("Required!")
-    .max(100, "Description must be at most 150 characters long."),
+    .max(100, "Description must be at most 30 characters long."),
 });

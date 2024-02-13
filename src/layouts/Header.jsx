@@ -16,10 +16,11 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router-dom";
 import Logo from "../assets/img/doctor-stethoscope-svgrepo-com (1).svg";
-import SignIn from "../components/SignIn";
+
 import SignInModal from "../components/SignInModal";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/slices/accountSlice";
+import SignUpModal from "../components/SignUpModal";
 const Header = () => {
   const { userName } = useSelector((x) => x.account);
   const dispatch = useDispatch();
@@ -97,16 +98,16 @@ const Header = () => {
               >
                 <FontAwesomeIcon icon={faUser} />
 
-                <SignInModal name={"SignIn"} />
                 {userName ? (
+                  <Button onClick={() => dispatch(logoutAction())}>
+                    Log Out
+                  </Button>
+                ) : (
                   <>
-                    <NavLink to="/contact">Your Profile</NavLink>
-
-                    <Button onClick={() => dispatch(logoutAction())}>
-                      Log Out
-                    </Button>
+                    <SignInModal name={"signIn"} />
+                    <SignUpModal name={"SignUp"} />
                   </>
-                ) : null}
+                )}
               </Box>
             </Flex>
           </Flex>
@@ -175,14 +176,18 @@ const Header = () => {
                   </NavLink>
                 </ListItem>
 
-                <ListItem className={syles.nav_listItem}>
-                  <NavLink
-                    className={({ isActive }) => (isActive ? syles.active : "")}
-                    to={"/Contact"}
-                  >
-                    Contact
-                  </NavLink>
-                </ListItem>
+                {userName ? (
+                  <ListItem className={syles.nav_listItem}>
+                    <NavLink
+                      className={({ isActive }) =>
+                        isActive ? syles.active : ""
+                      }
+                      to={"/appList"}
+                    >
+                      Scheduled Appointments
+                    </NavLink>
+                  </ListItem>
+                ) : null}
                 <ListItem className={syles.nav_listItem}>
                   <NavLink
                     className={({ isActive }) => (isActive ? syles.active : "")}

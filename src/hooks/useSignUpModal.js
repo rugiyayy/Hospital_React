@@ -5,63 +5,63 @@ import { useQuery } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAction } from "../redux/slices/accountSlice";
 import { httpClient } from "../utils/httpClient";
-import loginSchema from "../validations/loginSchema";
+import registerSchema from "../validations/registerSchema";
 
-export default function useSignInModal() {
+export default function useSignUpModal() {
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { isOpen, onOpen, onClose: _onClose, } = useDisclosure();
+  const { isOpen, onOpen, onClose: _onClose } = useDisclosure();
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.account);
 
   const formik = useFormik({
     initialValues: {
-      userName: "",
+      fullName: "",
+      email: "",
+      birthDate: "",
+      patientIdentityNumber: "",
       password: "",
     },
     onSubmit: (values) => {
       setIsLoading(true);
-      loginQuery(values);
+      registerQuery(values);
     },
-    validationSchema: loginSchema,
+    validationSchema: registerSchema,
   });
 
   const onClose = () => {
     formik.resetForm();
     _onClose();
-
   };
 
-  const loginQuery = async (values) => {
+  const registerQuery = async (values) => {
     try {
-      const response = await httpClient.post("/Account/SignIn", values, {
+      const response = await httpClient.post("/Patient", values, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       toast({
-        title: "Logged in.",
-        description: "You have been signed in successfully!",
+        title: "Signed Up.",
+        description: "You have been signed up successfully!",
         status: "success",
         duration: 3000,
         isClosable: true,
         position: "top-right",
       });
-
-      dispatch(
-        loginAction({ token: response.data, userName: values.userName })
-      );
+    
       onClose();
     } catch (error) {
-      // Проверяем, если есть ошибки в ответе
-      if (error.response && error.response?.data && error.response?.data?.errors) {
-        // Устанавливаем ошибки в форме с помощью метода setErrors
+      if (
+        error.response &&
+        error.response?.data &&
+        error.response?.data?.errors
+      ) {
         formik.setErrors(error.response?.data?.errors);
       } else {
-        //
         toast({
           title: "Error",
-          description: error.response?.data,
+          description: error?.response?.data,
           status: "error",
           duration: 3000,
           isClosable: true,

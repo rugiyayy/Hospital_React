@@ -8,6 +8,7 @@ import {
   Select,
   extendTheme,
   useToast,
+  Box,
 } from "@chakra-ui/react";
 import { Section } from "@react-email/components";
 import React, { useState, useRef, useEffect } from "react";
@@ -19,7 +20,7 @@ import { useFormik } from "formik";
 import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
 import { appointmentSchema } from "../../validations/appointmentSchema";
-import {useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppointmentRepetedParts, {
   Spinner1,
 } from "../../components/AppointmentRepetedParts";
@@ -83,7 +84,9 @@ function Appointment() {
         console.error("Error fetching available time slots:", error);
         toast({
           title: "Error",
-          description: error.response.data|| "Uppss something went wrong .. check your connection or logout and sign in again",
+          description:
+            error.response.data ||
+            "Uppss something went wrong .. check your connection or logout and sign in again",
           status: "error",
           duration: 4000,
           isClosable: true,
@@ -103,9 +106,8 @@ function Appointment() {
   //   navigate(`?${urlParams.toString()}`);
   // }, [formik.values.doctorId, formik.values.selectedDate]);
 
-
   const { isOpen, onClose } = useSignInModal();
-   const tomorrow = new Date();
+  const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 
   const next30Days = new Date();
@@ -126,11 +128,11 @@ function Appointment() {
     refetchOnWindowFocus: false,
   });
 
- 
-
   if (doctorLoading) {
     return <Spinner1 />;
   }
+
+
 
   return (
     <main>
@@ -173,8 +175,8 @@ function Appointment() {
                 soluta.
               </Text>
 
-              <FormControl gap="20px">
-                <Flex justifyContent="space-between">
+              <FormControl gap="20px"> 
+                <Flex justifyContent="space-between" >
                   {formik.errors.doctorId && formik.touched.doctorId && (
                     <Text color="red" width="58%">
                       {formik.errors.doctorId}
@@ -188,8 +190,9 @@ function Appointment() {
                     )}
                 </Flex>
                 <Flex
+                
                   alignItems="center"
-                  margin="20px 0"
+                  margin="20px 0 50px"
                   justifyContent="space-between"
                 >
                   <Select
@@ -197,6 +200,7 @@ function Appointment() {
                     ref={selectRef}
                     name="doctorId"
                     value={formik.values.doctorId}
+                    
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   >
@@ -226,7 +230,7 @@ function Appointment() {
                 </Flex>
 
                 {!userName ? (
-                  <SignInModal
+                  <SignInModal 
                     bg={"#e12454"}
                     isOpen={isOpen}
                     onClose={onClose}
@@ -236,17 +240,20 @@ function Appointment() {
                     hoverColor="white"
                   />
                 ) : (
-                  <Button
-                    gap="10px"
-                    justifyContent="center"
-                    alignItems="center"
-                    onClick={formik.handleSubmit}
-                    isLoading={isLoading}
-                    sx={theme.textStyles.a}
-                  >
-                    <Text> Click to see Aviable times</Text>
-                    <FontAwesomeIcon fontSize="28px" icon={faAngleRight} />
-                  </Button>
+                  <Box textAlign="center" margin="0 auto ">
+                    {" "}
+                    <Button
+                      gap="30px"
+                      justifyContent="center"
+                      alignItems="center"
+                      onClick={formik.handleSubmit}
+                      isLoading={isLoading}
+                      sx={theme.textStyles.a}
+                    >
+                      <Text> Next</Text>
+                      <FontAwesomeIcon fontSize="28px" icon={faAngleRight} />
+                    </Button>
+                  </Box>
                 )}
               </FormControl>
             </Flex>

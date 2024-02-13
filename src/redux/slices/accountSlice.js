@@ -19,8 +19,10 @@ export const accountSlice = createSlice({
 
       state.token = token;
       state.userName = decodedToken.email; 
-      state.patientId = decodedToken.PatientId;
-      console.log("Patient ID:", decodedToken.PatientId);
+      const patientId = parseInt(decodedToken.PatientId);
+      if (!isNaN(patientId)) { 
+        state.patientId = patientId;}
+      console.log("Patient ID:",typeof decodedToken.PatientId, "parsed:", typeof patientId); //string
       console.log("User logged in:", decodedToken.email);
       console.log("Token:", token);
     },

@@ -47,10 +47,10 @@ export default function Department() {
   }, [searchTerm]);
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-   
+
     urlParams.set("_page", page.toString());
     navigate(`?${urlParams.toString()}`);
-  }, [ location.search, navigate, page]);
+  }, [location.search, navigate, page]);
 
   if (isLoading) {
     return (
@@ -59,23 +59,22 @@ export default function Department() {
       </div>
     );
   }
- 
+
   const filteredData = data?.data?.filter((department) =>
     department.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const totalPages = filteredData
-  ? Math.ceil(filteredData.length / perPage)
-  : 0;
-const startIndex = filteredData ? (page - 1) * perPage : 0;
 
-const endIndex =
-  page === totalPages
-    ? filteredData
-      ? filteredData.length
-      : 0
-    : startIndex + perPage;
-  
-   
+  const totalPages = filteredData
+    ? Math.ceil(filteredData.length / perPage)
+    : 0;
+  const startIndex = filteredData ? (page - 1) * perPage : 0;
+
+  const endIndex =
+    page === totalPages
+      ? filteredData
+        ? filteredData.length
+        : 0
+      : startIndex + perPage;
 
   return (
     <main>
@@ -177,14 +176,17 @@ const endIndex =
               </Flex>
             ))}
           </SimpleGrid>
+          {filteredData && filteredData.length > 0 && (
+          <Box margin="3rem 0" textAlign="center">
+            <Pagination
+              filteredData={filteredData}
+              perPage={perPage}
+              page={page}
+              setPage={setPage}
+            />
+          </Box>
 
-          <Box margin="3rem 0" textAlign="center"><Pagination
-                  filteredData={filteredData}
-                  perPage={perPage}
-                  page={page}
-                  setPage={setPage}
-                />
-             </Box>
+          )}
         </Container>
       </Section>
     </main>

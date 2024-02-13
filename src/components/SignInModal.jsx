@@ -25,8 +25,8 @@ import { useSelector } from "react-redux";
 export default function SignInModal(prop) {
   const { onOpen, isLoading, onClose, formik, isOpen } = useSignInModal();
   const { userName } = useSelector((x) => x.account);
-  const [show, setShow] = React.useState(false)
-  const handleClick = () => setShow(!show)
+  const [show, setShow] = React.useState(false);
+  const handleClick = () => setShow(!show);
   return (
     <>
       {userName ?? (
@@ -88,7 +88,7 @@ export default function SignInModal(prop) {
             </FormControl>
           </ModalBody>
 
-          <ModalFooter gap="12px" flexDirection="column" margin="0 auto">
+          <ModalFooter gap="12px" flexDirection="column" margin="0 auto 12px">
             <Button
               background="green"
               _hover={{ backgroundColor: "green.500" }}
@@ -99,15 +99,6 @@ export default function SignInModal(prop) {
             >
               Sign In
             </Button>
-
-            <Flex gap="12px">
-              Don't have an account?
-              <NavLink to="/signup" as="span">
-                <Button variant="link" onClick={onClose}>
-                  Sign up
-                </Button>
-              </NavLink>
-            </Flex>
           </ModalFooter>
         </ModalContent>
       </Modal>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppointmentRepetedParts from "../../components/AppointmentRepetedParts";
 import { httpClient } from "../../utils/httpClient";
 import { useMutation, useQuery } from "react-query";
@@ -45,22 +45,48 @@ export default function AppointmentDetails() {
       },
     },
   });
+  const [loggedIn, setLoggedIn] = useState(true); 
+  const { userName } = useSelector((state) => state.account);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const doctorId = queryParams.get("doctorId");
+  const parsedDoctorId = parseInt(doctorId);
+
   const selectedDate = queryParams.get("selectedDate");
   const { token, patientId } = useSelector((state) => state.account);
+  const parsedPatientId = parseInt(patientId);
   const toast = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userName) {
+      setLoggedIn(false);
+      toast({
+        title: "Logged Out",
+        description: "You have been logged out.",
+        status: "info",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
+  }, [userName, toast]);
+  useEffect(() => {
+    if (!loggedIn) {
+      navigate("/appointment");
+    }
+  }, [loggedIn, navigate]);
+
+
   const getDoctorName = async () => {
-    const response = await httpClient.get(`/doctor/${doctorId}`);
+    const response = await httpClient.get(`/doctor/${parsedDoctorId}`);
     return response.data.fullName;
   };
   const {
     isLoading: isDoctorLoading,
     data: doctorData,
     error: doctorError,
-  } = useQuery(["doctor", doctorId], getDoctorName, {
+  } = useQuery(["doctor", parsedDoctorId], getDoctorName, {
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });
@@ -72,7 +98,7 @@ export default function AppointmentDetails() {
       },
       params: {
         selectedDate: selectedDate,
-        doctorId: doctorId,
+        doctorId: parsedDoctorId,
       },
     });
   };
@@ -80,14 +106,18 @@ export default function AppointmentDetails() {
     isLoading: timeSlotLoading,
     data: timeSlot,
     error: timeSlotError,
-  } = useQuery(["availableTimeSlots", doctorId, selectedDate], getTimeSlot, {
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-  });
+  } = useQuery(
+    ["availableTimeSlots", parsedDoctorId, selectedDate],
+    getTimeSlot,
+    {
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+    }
+  );
 
   const createAppointment = useMutation(
     (formData) =>
-      httpClient.post("/appointment/scheduleAppointment", formData, {
+      httpClient.post("/appointment", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -102,7 +132,7 @@ export default function AppointmentDetails() {
           isClosable: true,
           position: "top-right",
         });
-        navigate(`/appointment`); 
+        navigate(`/appointment`);
       },
       onError: (error) => {
         console.error("Error creating appointment:", error);
@@ -110,6 +140,7 @@ export default function AppointmentDetails() {
           title: "Error",
           description:
             error.response?.data ||
+            error.message ||
             "Something went wrong. Please try again later.",
           status: "error",
           duration: 4000,
@@ -120,47 +151,41 @@ export default function AppointmentDetails() {
     }
   );
 
+  const onSubmit = (values) => {
+    const formData = {
+      StartTime: values.startTime,
+      DoctorId: parsedDoctorId,
+      PatientId: parsedPatientId,
+      Description: values.description,
+    };
+
+    createAppointment.mutate(formData);
+  };
+
   const formik = useFormik({
     initialValues: {
       startTime: selectedDate,
-      patientId:  Number(patientId),
-      doctorId:  Number(doctorId),
+      patientId: parsedPatientId,
+      doctorId: parsedDoctorId,
       description: "",
     },
     validationSchema: appDetailsSchema,
-    onSubmit: (values) => {
-      createAppointment.mutate(values); 
-    },
+    onSubmit: onSubmit,
   });
   const [selectedTime, setSelectedTime] = useState(null);
 
   const handleSelectTime = (time) => {
-    setSelectedTime(selectedTime === time ? null : time); 
-    const startTime = `${selectedDate}  ${selectedTime === time ? "" : time}`;
+    setSelectedTime(selectedTime === time ? null : time);
+    const startTime =
+      selectedTime === time ? selectedDate : `${selectedDate} ${time}`;
     formik.setFieldValue("startTime", startTime);
   };
 
+  if (!loggedIn) {
+    return null;
+  }
+
   ////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 
   return (
     <main>
@@ -208,8 +233,7 @@ export default function AppointmentDetails() {
                   </GridItem>
                 ))}
               </SimpleGrid>
-              {timeSlotLoading && <p>Loading...</p>}{" "}
-              {/* potom napishu */}
+              {timeSlotLoading && <p>Loading...</p>} {/* potom napishu */}
               {timeSlotError && <p>Error: {timeSlotError.message}</p>}
             </Flex>
             <Flex
@@ -225,11 +249,11 @@ export default function AppointmentDetails() {
                 </FormLabel>
                 <Textarea
                   placeholder="checkup..."
-                  value={formik.values.description} 
-                  onChange={formik.handleChange} 
-                  onBlur={formik.handleBlur} 
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   name="description"
-                  maxLength={99} 
+                  maxLength={29}
                 />
                 {formik.touched.description && formik.errors.description ? (
                   <div>{formik.errors.description}</div>
@@ -237,7 +261,7 @@ export default function AppointmentDetails() {
                 <ButtonGroup margin="20px 0 0">
                   {" "}
                   <Button onClick={() => navigate(`/appointment`)}>
-                    click to previous page{" "}
+                    Go Back to Previous Page
                   </Button>
                   <Button onClick={formik.handleSubmit}>
                     Make Appointment

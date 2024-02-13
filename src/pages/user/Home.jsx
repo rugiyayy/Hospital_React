@@ -496,7 +496,7 @@ export default function Home() {
       <Section className={styles.banner_2}>
         <Container maxW="80%">
           <Box
-            padding="5rem 0"
+            padding="8rem 0"
             display="flex"
             flexDirection="column"
             gap="20px"
