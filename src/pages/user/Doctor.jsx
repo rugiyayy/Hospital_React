@@ -60,7 +60,7 @@ const theme = extendTheme({
 
 //! start
 export default function Doctor() {
-  const userName = useSelector((state) => state.account.userName);
+  const { userName, role } = useSelector((state) => state.account);
 
   const { isOpen, onClose } = useSignInModal();
 
@@ -73,7 +73,7 @@ export default function Doctor() {
   const selectedFiltersRedux = useSelector((state) => state.selectedFilters);
 
   const [page, setPage] = useState(1);
-  const [perPage] = useState(9);
+  const [perPage] = useState(2);
 
   //#region //!GET Doctor, DocType, Department
   const getDoctors = () => {
@@ -168,7 +168,7 @@ export default function Doctor() {
   //#endregion
 
   //#region  //! Filtered Data
-  const filteredData = doctor?.data?.filter((doctor) => {
+  const filteredData = doctor?.data?.doctors?.filter((doctor) => {
     const nameMatches = doctor?.fullName
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -187,6 +187,8 @@ export default function Doctor() {
 
     return nameMatches && typeMatches && departmentMatches;
   });
+  console.log(filteredData);
+  console.log(doctor.data.doctors);
 
   //#endregion
 
@@ -218,6 +220,9 @@ export default function Doctor() {
     });
   };
   //#endregion
+  
+
+  console.log(department?.data?.departments);
 
   return (
     <main>
@@ -274,7 +279,7 @@ export default function Doctor() {
               Autem maxime rem modi eaque, voluptate. Beatae officiis neque
             </Text>
           </Box>
-          {doctor?.data?.length > 0 && (
+          {doctor?.data?.totalCount > 0 && (
             // {/* //! Seacrh Input */}
 
             <InputGroup w="50%" margin="0 auto">
@@ -311,7 +316,7 @@ export default function Doctor() {
                 >
                   Doctor Types
                 </Text>
-                {doctorType?.data?.map((type) => (
+                {doctorType?.data?.types?.map((type) => (
                   <Stack spacing={5} direction="column">
                     <FormControl
                       isDisabled={
@@ -375,7 +380,7 @@ export default function Doctor() {
                   Departments
                 </Text>
                 <Box>
-                  {department?.data?.map((dep) => (
+                  {department?.data?.departments?.map((dep) => (
                     <Stack spacing={5} direction="column">
                       <FormControl
                         isDisabled={
@@ -434,8 +439,12 @@ export default function Doctor() {
                   <GridItem colSpan={1}>
                     {" "}
                     <Card margin="12px 0" height="54vh" key={doctor.id}>
-                      <CardHeader>
-                        <NavLink color={colors.paragraph} to="/">
+                      <CardHeader
+                        onClick={() =>
+                          navigate(`/singleDoctor?id=${doctor.id}`)
+                        }
+                      >
+                        <NavLink color={colors.paragraph}>
                           {doctor.docPhoto?.photoPath != null && (
                             <Image
                               padding="20px"
@@ -473,23 +482,30 @@ export default function Doctor() {
                         </Text>
                       </CardBody>
                       <CardFooter margin="0 auto" padding="12px 24px">
-                        
-                          {!userName ? (
-                            <SignInModal
-                              bg={"#e12454"}
-                              isOpen={isOpen}
-                              onClose={onClose}
-                              name={"Make Appointment"}
-                              color="white"
-                              hoverBg="#223a66"
-                              hoverColor="white"
-                            />
-                          ) : (
-                            <Button sx={theme.textStyles.a}>
-                              <Link to="/appointment">Make Appointment</Link>
-                            </Button>
-                          )}
-                      
+                        {role !== "Doctor" && (
+                          <>
+                            {!userName ? (
+                              <SignInModal
+                                bg={"#e12454"}
+                                isOpen={isOpen}
+                                onClose={onClose}
+                                name={"Make Appointment"}
+                                color="white"
+                                hoverBg="#223a66"
+                                hoverColor="white"
+                              />
+                            ) : (
+                              <Button
+                                sx={theme.textStyles.a}
+                                onClick={() =>
+                                  navigate(`/appointment?doctorId=${doctor.id}`)
+                                }
+                              >
+                                Make Appointment
+                              </Button>
+                            )}
+                          </>
+                        )}
                       </CardFooter>
                     </Card>
                   </GridItem>

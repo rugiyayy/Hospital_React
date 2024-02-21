@@ -20,7 +20,7 @@ import { useFormik } from "formik";
 import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
 import { appointmentSchema } from "../../validations/appointmentSchema";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import AppointmentRepetedParts, {
   Spinner1,
 } from "../../components/AppointmentRepetedParts";
@@ -52,13 +52,28 @@ function Appointment() {
 
   const selectRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
-  const { token, userName } = useSelector((state) => state.account);
+  const { token, userName,role } = useSelector((state) => state.account);
   const toast = useToast();
+  const queryParams = new URLSearchParams(location.search);
+  
+
+  useEffect(() => {
+    if (role === "Doctor") {
+      navigate("/");
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to view this page.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  }, [role, navigate, toast]);
   const formik = useFormik({
     initialValues: {
       selectedDate: "",
       fullName: "",
-      doctorId: null,
+      doctorId: null|| queryParams.get("doctorId")
     },
     validationSchema: appointmentSchema,
     onSubmit: async (values) => {
@@ -207,7 +222,7 @@ function Appointment() {
                     <option selected disabled value="default">
                       Select Doctor
                     </option>
-                    {doctor?.data?.map((x, i) => {
+                    {doctor?.data?.doctors?.map((x, i) => {
                       return (
                         <option key={i} value={x.id}>
                           {x.fullName}

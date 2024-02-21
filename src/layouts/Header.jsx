@@ -22,7 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/slices/accountSlice";
 import SignUpModal from "../components/SignUpModal";
 const Header = () => {
-  const { userName } = useSelector((x) => x.account);
+  const { userName, role } = useSelector((x) => x.account);
   const dispatch = useDispatch();
   return (
     <header>
@@ -99,13 +99,17 @@ const Header = () => {
                 <FontAwesomeIcon icon={faUser} />
 
                 {userName ? (
-                  <Button onClick={() => dispatch(logoutAction())}>
-                    Log Out
-                  </Button>
+                  <>
+                    {" "}
+                    {userName}
+                    <Button onClick={() => dispatch(logoutAction())}>
+                      Log Out
+                    </Button>
+                  </>
                 ) : (
                   <>
-                    <SignInModal name={"signIn"} />
-                    <SignUpModal name={"SignUp"} />
+                    <SignInModal name={"Sign In"} />
+                    <SignUpModal name={"Sign Up"} />
                   </>
                 )}
               </Box>
@@ -176,7 +180,7 @@ const Header = () => {
                   </NavLink>
                 </ListItem>
 
-                {userName ? (
+                {userName && role != "Doctor" && (
                   <ListItem className={syles.nav_listItem}>
                     <NavLink
                       className={({ isActive }) =>
@@ -187,15 +191,57 @@ const Header = () => {
                       Scheduled Appointments
                     </NavLink>
                   </ListItem>
-                ) : null}
-                <ListItem className={syles.nav_listItem}>
-                  <NavLink
-                    className={({ isActive }) => (isActive ? syles.active : "")}
-                    to={"/Appointment"}
-                  >
-                    Appointment
-                  </NavLink>
-                </ListItem>
+                )}
+                {role !== "Doctor" && (
+                  <ListItem className={syles.nav_listItem}>
+                    <NavLink
+                      className={({ isActive }) =>
+                        isActive ? syles.active : ""
+                      }
+                      to={"/Appointment"}
+                    >
+                      Appointment
+                    </NavLink>
+                  </ListItem>
+                )}
+
+                {userName && role === "Doctor" && (
+                  <ListItem className={syles.nav_listItem}>
+                    <NavLink
+                      className={({ isActive }) =>
+                        isActive ? syles.active : ""
+                      }
+                      to={"/docAppList"}
+                    >
+                      All Appointmnets
+                    </NavLink>
+                  </ListItem>
+                )}
+                {userName && role === "Doctor" && (
+                  <ListItem className={syles.nav_listItem}>
+                    <NavLink
+                      className={({ isActive }) =>
+                        isActive ? syles.active : ""
+                      }
+                      to={"/docChat"}
+                    >
+                      Chat
+                    </NavLink>
+                  </ListItem>
+                )}
+
+                {/* {userName && (
+                  <ListItem className={syles.nav_listItem}>
+                    <NavLink
+                      className={({ isActive }) =>
+                        isActive ? syles.active : ""
+                      }
+                      to={"/waitingRoom"}
+                    >
+                      Waiting Room
+                    </NavLink>
+                  </ListItem>
+                )} */}
               </List>
             </HStack>
           </Flex>

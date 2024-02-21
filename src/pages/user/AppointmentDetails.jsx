@@ -46,14 +46,13 @@ export default function AppointmentDetails() {
     },
   });
   const [loggedIn, setLoggedIn] = useState(true); 
-  const { userName } = useSelector((state) => state.account);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const doctorId = queryParams.get("doctorId");
   const parsedDoctorId = parseInt(doctorId);
 
   const selectedDate = queryParams.get("selectedDate");
-  const { token, patientId } = useSelector((state) => state.account);
+  const { userName, token, patientId,role } = useSelector((state) => state.account);
   const parsedPatientId = parseInt(patientId);
   const toast = useToast();
   const navigate = useNavigate();
@@ -76,6 +75,19 @@ export default function AppointmentDetails() {
       navigate("/appointment");
     }
   }, [loggedIn, navigate]);
+
+  useEffect(() => {
+    if (role === "Doctor") {
+      navigate("/");
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to view this page.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  }, [role, navigate, toast]);
 
 
   const getDoctorName = async () => {
@@ -208,7 +220,6 @@ export default function AppointmentDetails() {
                   <Text>{`Available time slots for ${selectedDate}:`}</Text>
                 )}
               </VStack>
-              {/* <Flex flexWrap="wrap" gap="20px" justifyContent="space-between"> */}
               <SimpleGrid templateColumns="repeat(4, 4fr)" gap="20px">
                 {timeSlot?.data?.map((time, i) => (
                   <GridItem w="105px">

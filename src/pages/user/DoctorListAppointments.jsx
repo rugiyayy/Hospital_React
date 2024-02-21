@@ -18,6 +18,10 @@ import {
   ButtonGroup,
   Button,
   useToast,
+  InputGroup,
+  InputLeftElement,
+  Input,
+  Select,
 } from "@chakra-ui/react";
 
 import React, { useEffect, useState } from "react";
@@ -27,13 +31,17 @@ import { useSelector } from "react-redux";
 import { colors } from "../../components/Constants";
 import { Spinner1 } from "../../components/AppointmentRepetedParts";
 import { useLocation, useNavigate } from "react-router-dom";
+import { CalendarIcon } from "@chakra-ui/icons";
 
-export default function ListAppointmnets() {
+export default function DoctorListAppointments() {
+  const [isActiveFilter, setIsActiveFilter] = useState(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
-  const [perPage] = useState(5);
+  const [perPage, setPerPage] = useState(5);
   const location = useLocation();
   const navigate = useNavigate();
-  const { token, patientId, userName, role } = useSelector(
+  const { token, doctorId, userName, role } = useSelector(
     (state) => state.account
   );
 
@@ -52,19 +60,15 @@ export default function ListAppointmnets() {
         position: "top-right",
       });
     }
-
-    
   }, [userName, toast]);
   useEffect(() => {
     if (!loggedIn) {
-      navigate("/appointment");
+      navigate("/");
     }
   }, [loggedIn, navigate]);
 
- 
-
   useEffect(() => {
-    if (role === "Doctor") {
+    if (role !== "Doctor") {
       navigate("/");
       toast({
         title: "Access Denied",
@@ -76,23 +80,29 @@ export default function ListAppointmnets() {
     }
   }, [role, navigate, toast]);
 
-  const getAppointments = (page, perPage) => {
-    return httpClient.get(
-      `/appointment/patients/${patientId}?_page=${page}&_perPage=${perPage}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  const getAppointments = async () => {
+    const params = {
+      page,
+      perPage,
+      isActive: isActiveFilter,
+      startDate: startDate,
+      endDate: endDate,
+    };
+    const response = await httpClient.get(`/appointment/doctors/${doctorId}`, {
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
   };
   const {
     isLoading: appointmentLoading,
     data: appointment,
     error: appointmentError,
   } = useQuery(
-    ["appointment", page, perPage],
-    () => getAppointments(page, perPage),
+    ["appointment", isActiveFilter, page, perPage, startDate, endDate],
+    getAppointments,
     {
       refetchOnWindowFocus: false,
     }
@@ -100,16 +110,48 @@ export default function ListAppointmnets() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    urlParams.set("_page", page.toString());
-    urlParams.set("_perPage", perPage.toString());
+    urlParams.set("endDate", endDate);
+    urlParams.set("startDate", startDate);
+    urlParams.set("isActive", isActiveFilter);
+    urlParams.set("page", page.toString());
+    urlParams.set("perPage", perPage.toString());
+
     navigate(`?${urlParams.toString()}`);
-  }, [page, perPage, location.search]);
+  }, [isActiveFilter, page, perPage, endDate, startDate, navigate]);
+
+  const handleStartDateChange = (e) => {
+    e.preventDefault();
+    const startDateValue = e.target.value;
+    setStartDate(startDateValue);
+    if (endDate && new Date(startDateValue) > new Date(endDate)) {
+      setEndDate("");
+    }
+  };
+
+  const handleEndDateChange = (e) => {
+    e.preventDefault();
+    setEndDate(e.target.value);
+  };
 
   const handlePreviousPage = () => {
     if (page > 1) {
       setPage(page - 1);
     }
   };
+
+  const handleResetAll = () => {
+    setIsActiveFilter(null);
+    setStartDate("");
+    setEndDate("");
+    setPage(1);
+    setPerPage(5);
+  };
+  const handleReset = () => {
+    setStartDate("");
+    setEndDate("");
+    setPage(1);
+  };
+
   const totalAppointments = appointment?.data?.totalCount ?? 0;
   const totalPages = Math.ceil(totalAppointments / perPage);
   const handleNextPage = () => {
@@ -121,12 +163,15 @@ export default function ListAppointmnets() {
   if (!loggedIn) {
     return null;
   }
-  if (appointmentLoading) {
-    return <Spinner1 />;
-  }
+  //   if (appointmentLoading) {
+  //     return <Spinner1 />;
+  //   }
+
+
+  console.log(appointment?.totalCount===0);
 
   return (
-    <Container maxW="72%">
+    <Container mt="1rem" mb="6rem" maxW="72%">
       <Box>
         <Text
           mb="40px"
@@ -156,6 +201,67 @@ export default function ListAppointmnets() {
           If you want to change the appointment time, please contact the clinic.
         </Text>
       </Box>
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!
+      <Box>
+        <Button onClick={handleResetAll} colorScheme="red" marginLeft="10px">
+          Reset All filters
+        </Button>
+      </Box>
+      <Box width="20%" margin="0 60px ">
+        <Select
+          value={
+            isActiveFilter === null
+              ? "all"
+              : isActiveFilter
+              ? "active"
+              : "inactive"
+          }
+          onChange={(e) => {
+            setPage(1);
+            const selectedValue = e.target.value;
+            setIsActiveFilter(
+              selectedValue === "all"
+                ? null
+                : selectedValue === "active"
+                ? true
+                : false
+            );
+          }}
+        >
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </Select>
+      </Box>
+      <InputGroup w="50%" margin="3rem auto">
+        <InputLeftElement pointerEvents="none">
+          <CalendarIcon marginLeft={3} color="gray.600" />
+        </InputLeftElement>
+        <Input
+          borderRadius="20px"
+          type="date"
+          onKeyDown={(e) => e.preventDefault()}
+          placeholder="Start Date"
+          value={startDate}
+          onChange={handleStartDateChange}
+        />
+        <InputLeftElement pointerEvents="none">
+          <CalendarIcon marginLeft={3} color="gray.600" />
+        </InputLeftElement>
+        <Input
+          borderRadius="20px"
+          type="date"
+          placeholder="End Date"
+          onKeyDown={(e) => e.preventDefault()}
+          value={endDate}
+          min={startDate}
+          onChange={handleEndDateChange}
+        />
+      </InputGroup>
+      <Button onClick={handleReset} colorScheme="blue" marginLeft="10px">
+        Reset Date
+      </Button>
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!!
       {appointmentError && (
         <Text
           color={colors.primary}
@@ -168,51 +274,37 @@ export default function ListAppointmnets() {
           Something went wrong , please try again later
         </Text>
       )}
-      {appointmentError &&
-        !appointmentLoading &&
-        !appointment?.data?.appointments?.length > 0 && (
-          <Text
-            color={colors.primary}
-            fontWeight="700"
-            fontSize="32px"
-            textAlign="center"
-            padding="3rem 0 "
-            as="h2"
-          >
-            You don't have any appointments
-          </Text>
-        )}
-      {appointment?.data?.appointments?.length > 0 && (
+      {appointment?.appointments?.length > 0 && (
         <Table w="90%" variant="simple" margin="50px auto ">
           <Thead>
             <Tr>
               <Th></Th>
-              <Th>Doctor</Th>
+              <Th>Patient Full Name</Th>
               <Th textAlign="center">Start Time</Th>
               <Th textAlign="center">Details</Th>
               <Th textAlign="end">Status</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {appointment?.data?.appointments?.map((appointment, i) => (
-              <Tr>
+            {appointment?.appointments?.map((appointment, i) => (
+              <Tr key={appointment?.id}>
                 <Td>{i + 1 + page * perPage - perPage}</Td>
-                <Td>{appointment.doctor?.fullName}</Td>
+                <Td>{appointment?.patient?.fullName}</Td>
                 <Td textAlign="center">{appointment?.formattedStartTime}</Td>
                 {/* <Td></Td> */}
                 <Td textAlign="center" w="30%">
-                  {appointment.description}
+                  {appointment?.description}
                 </Td>
                 <Td
                   textAlign="end"
                   fontWeight="700"
                   color={
-                    appointment.isActive === true ? "green" : colors.primary
+                    appointment?.isActive === true ? "green" : colors.primary
                   }
                 >
-                  {appointment.isActive === true
+                  {appointment?.isActive === true
                     ? "Active"
-                    : appointment.isActive === false
+                    : appointment?.isActive === false
                     ? "Inactive"
                     : "Not specified"}
                 </Td>
@@ -221,7 +313,7 @@ export default function ListAppointmnets() {
           </Tbody>
         </Table>
       )}
-      <ButtonGroup w="100%" margin="20px 0 40px" justifyContent="center">
+      <ButtonGroup w="100%" margin="2rem 0 5rem" justifyContent="center">
         <Button
           _active={{
             bg: "#dddfe2",
@@ -248,7 +340,7 @@ export default function ListAppointmnets() {
               "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
           }}
           onClick={handleNextPage}
-          isDisabled={appointment?.data?.appointments?.length < perPage}
+          isDisabled={appointment?.totalCount == perPage ||appointment?.totalCount<perPage*page}
         >
           Next Page
         </Button>

@@ -10,22 +10,74 @@ import Doctor from "./pages/user/Doctor";
 import Appointment from "./pages/user/Appointment";
 import AppointmentDetails from "./pages/user/AppointmentDetails";
 import ListAppointmnets from "./pages/user/ListAppointmnets";
+import SingleDoctor from "./pages/user/SingleDoctor";
+import {
+  ProtectedRoute,
+  ProtectedRoute2,
+  ProtectedRoute3,
+} from "./utils/ProtectedRoute";
+import DoctorListAppointments from "./pages/user/DoctorListAppointments";
+import DocChatP from "./pages/user/DocChatP";
+import WaitingRoom from "./components/WaitingRoom";
 
 function App() {
   return (
     <ChakraProvider>
       <Router>
         <Routes>
-          <Route element={<Layout />}> 
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/signin" element={<SignIn />} />
+          <Route element={<Layout />}>
+            {/* <Route path="/signup" element={<SignUp />} />
+            <Route path="/signin" element={<SignIn />} /> */}
+            <Route path="/singleDoctor" element={<SingleDoctor />} />
             <Route path="/" element={<Home />} />
             <Route path="/department" element={<Department />} />
-            <Route path="/doctors" element={<Doctor/>} />
-            <Route path="/appointment" element={<Appointment/>} />
-            <Route path="/appointment-details" element={<AppointmentDetails/>} />
-            <Route path="/appList" element={<ListAppointmnets/>} />
+            <Route path="/doctors" element={<Doctor />} />
+            <Route path="/appointment" element={<Appointment />} />
+            <Route
+              path="/appointment-details"
+              element={
+                <ProtectedRoute2>
+                  <AppointmentDetails />
+                </ProtectedRoute2>
+              }
+            />
+            <Route
+              path="/appList"
+              element={
+                <ProtectedRoute2>
+                  <ListAppointmnets />
+                </ProtectedRoute2>
+              }
+            />
 
+            <Route
+              path="/docAppList"
+              element={
+                <ProtectedRoute3>
+                  <DoctorListAppointments />
+                </ProtectedRoute3>
+              }
+            />
+
+            <Route
+              path="/docChat"
+              element={
+                <ProtectedRoute3>
+                  <DocChatP />
+                </ProtectedRoute3>
+              }
+            />
+
+            {/* <Route
+              path="/waitingRoom"
+              element={
+                <ProtectedRoute3>
+                  <WaitingRoom />
+                </ProtectedRoute3>
+              }
+            /> */}
+
+            <Route path="/*" element={<Home />} />
           </Route>
         </Routes>
       </Router>

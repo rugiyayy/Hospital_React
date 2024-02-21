@@ -19,6 +19,7 @@ export default function useSignUpModal() {
       fullName: "",
       email: "",
       birthDate: "",
+      phoneNumber: "",
       patientIdentityNumber: "",
       password: "",
     },
@@ -49,7 +50,7 @@ export default function useSignUpModal() {
         isClosable: true,
         position: "top-right",
       });
-    
+
       onClose();
     } catch (error) {
       if (
@@ -57,13 +58,41 @@ export default function useSignUpModal() {
         error.response?.data &&
         error.response?.data?.errors
       ) {
-        formik.setErrors(error.response?.data?.errors);
+        formik.setErrors(
+          error?.response?.data?.errors ||
+            error?.response?.data ||
+            "Something went wrong. Please try again later."
+        );
+        toast({
+          title: "Error",
+          description:
+            error?.response?.data?.errors?.Email ||
+            error?.response?.data?.errors?.Password ||
+            error?.response?.data?.errors?.UserName ||
+            error?.response?.data?.Errors?.IsAdmin ||
+            error?.response?.data?.errors?.FullName ||
+            error?.response?.data ||
+            "Something went wrong. Please try again later.",
+
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "top-right",
+        });
       } else {
         toast({
           title: "Error",
-          description: error?.response?.data,
+          description:
+            error?.response?.data?.errors?.Email ||
+            error?.response?.data?.errors?.Password ||
+            error?.response?.data?.errors?.UserName ||
+            error?.response?.data?.Errors?.IsAdmin ||
+            error?.response?.data?.errors?.FullName ||
+            error?.response?.data ||
+            error?.response ||
+            "Something went wrong. Please try again later.",
           status: "error",
-          duration: 3000,
+          duration: 4000,
           isClosable: true,
           position: "top-right",
         });

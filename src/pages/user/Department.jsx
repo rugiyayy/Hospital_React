@@ -60,10 +60,10 @@ export default function Department() {
     );
   }
 
-  const filteredData = data?.data?.filter((department) =>
+  const filteredData = data?.data?.departments?.filter((department) =>
     department.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+console.log(data.data.departments);
   const totalPages = filteredData
     ? Math.ceil(filteredData.length / perPage)
     : 0;
@@ -111,7 +111,7 @@ export default function Department() {
               porro cumque quaerat.
             </Text>
           </Box>
-          {data?.data.length > 0 && (
+          {data?.data?.departments?.length > 0 && (
             <InputGroup w="50%" margin="0 auto">
               <InputLeftElement pointerEvents="none">
                 <Search2Icon marginLeft={3} color="gray.600" />

@@ -10,7 +10,7 @@ import loginSchema from "../validations/loginSchema";
 export default function useSignInModal() {
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { isOpen, onOpen, onClose: _onClose, } = useDisclosure();
+  const { isOpen, onOpen, onClose: _onClose } = useDisclosure();
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.account);
 
@@ -29,7 +29,6 @@ export default function useSignInModal() {
   const onClose = () => {
     formik.resetForm();
     _onClose();
-
   };
 
   const loginQuery = async (values) => {
@@ -52,13 +51,15 @@ export default function useSignInModal() {
         loginAction({ token: response.data, userName: values.userName })
       );
       onClose();
-    } catch (error) {
-      // Проверяем, если есть ошибки в ответе
-      if (error.response && error.response?.data && error.response?.data?.errors) {
-        // Устанавливаем ошибки в форме с помощью метода setErrors
+    } 
+    catch (error) {
+      if (
+        error.response &&
+        error.response?.data &&
+        error.response?.data?.errors
+      ) {
         formik.setErrors(error.response?.data?.errors);
       } else {
-        //
         toast({
           title: "Error",
           description: error.response?.data,
@@ -68,7 +69,8 @@ export default function useSignInModal() {
           position: "top-right",
         });
       }
-    } finally {
+    }
+     finally {
       setIsLoading(false);
     }
   };
