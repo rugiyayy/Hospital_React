@@ -223,25 +223,13 @@ const Header = () => {
                       className={({ isActive }) =>
                         isActive ? syles.active : ""
                       }
-                      to={"/docChat"}
+                      to={"/sendEmail"}
                     >
-                      Chat
+                      Send Email
                     </NavLink>
                   </ListItem>
                 )}
-
-                {/* {userName && (
-                  <ListItem className={syles.nav_listItem}>
-                    <NavLink
-                      className={({ isActive }) =>
-                        isActive ? syles.active : ""
-                      }
-                      to={"/waitingRoom"}
-                    >
-                      Waiting Room
-                    </NavLink>
-                  </ListItem>
-                )} */}
+              
               </List>
             </HStack>
           </Flex>

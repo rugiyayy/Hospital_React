@@ -1,4 +1,3 @@
-// Sample Checkbox Component
 const Checkbox = ({ label, checked, onChange }) => (
     <label>
       <input type="checkbox" checked={checked} onChange={onChange} />
@@ -6,7 +5,6 @@ const Checkbox = ({ label, checked, onChange }) => (
     </label>
   );
   
-  // Sample Usage
   <Checkbox
     label="Neurology"
     checked={selectedDepartments.includes(88)}

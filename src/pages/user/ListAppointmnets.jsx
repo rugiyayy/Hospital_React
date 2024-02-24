@@ -124,7 +124,7 @@ export default function ListAppointmnets() {
   if (appointmentLoading) {
     return <Spinner1 />;
   }
-
+console.log(appointment?.data?.appointments);
   return (
     <Container maxW="72%">
       <Box>
@@ -197,7 +197,7 @@ export default function ListAppointmnets() {
             {appointment?.data?.appointments?.map((appointment, i) => (
               <Tr>
                 <Td>{i + 1 + page * perPage - perPage}</Td>
-                <Td>{appointment.doctor?.fullName}</Td>
+                <Td>{appointment.doctorFullName}</Td>
                 <Td textAlign="center">{appointment?.formattedStartTime}</Td>
                 {/* <Td></Td> */}
                 <Td textAlign="center" w="30%">

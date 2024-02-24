@@ -17,8 +17,8 @@ import {
   ProtectedRoute3,
 } from "./utils/ProtectedRoute";
 import DoctorListAppointments from "./pages/user/DoctorListAppointments";
-import DocChatP from "./pages/user/DocChatP";
-import WaitingRoom from "./components/WaitingRoom";
+import SendEmail from "./pages/SendEmail";
+import ForgotPassword from "./pages/user/ForgotPassword";
 
 function App() {
   return (
@@ -33,6 +33,9 @@ function App() {
             <Route path="/department" element={<Department />} />
             <Route path="/doctors" element={<Doctor />} />
             <Route path="/appointment" element={<Appointment />} />
+            <Route path="/forgotPassword" element={<ForgotPassword />} />
+           
+           
             <Route
               path="/appointment-details"
               element={
@@ -60,22 +63,13 @@ function App() {
             />
 
             <Route
-              path="/docChat"
+              path="/sendEmail"
               element={
                 <ProtectedRoute3>
-                  <DocChatP />
+                  <SendEmail />
                 </ProtectedRoute3>
               }
             />
-
-            {/* <Route
-              path="/waitingRoom"
-              element={
-                <ProtectedRoute3>
-                  <WaitingRoom />
-                </ProtectedRoute3>
-              }
-            /> */}
 
             <Route path="/*" element={<Home />} />
           </Route>

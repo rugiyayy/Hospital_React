@@ -239,7 +239,7 @@ function Appointment() {
                     value={formik.values.selectedDate}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    min={tomorrow.toISOString().split("T")[0]}
+                    min={new Date().toISOString().split("T")[0]}
                     max={next30Days.toISOString().split("T")[0]}
                   />
                 </Flex>

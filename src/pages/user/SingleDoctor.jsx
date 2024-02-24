@@ -91,16 +91,16 @@ const SingleDoctor = () => {
         <Section  class="section doctor-single">
           <Flex margin="1rem 0 5rem " alignItems="center" textAlign="center">
             <Box width="30%">
-              {doctor?.data?.docPhoto?.photoPath != null && (
+              {doctor?.data?.photoPath != null && (
                 <Image
                   objectFit="cover"
                   width="100%"
                   height="400"
-                  src={`https://localhost:7041/Images/${doctor?.data?.docPhoto?.photoPath}`}
+                  src={`https://localhost:7041/Images/${doctor?.data?.photoPath}`}
                   borderRadius="lg"
                 />
               )}
-              {doctor?.data?.docPhoto?.photoPath == null && (
+              {doctor?.data?.photoPath == null && (
                 <Image
                   objectFit="cover"
                   width="100%"

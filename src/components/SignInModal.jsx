@@ -18,7 +18,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { useRef } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import useSignInModal from "../hooks/useSignInModal";
 import { useSelector } from "react-redux";
 
@@ -98,6 +98,9 @@ export default function SignInModal(prop) {
               mr={3}
             >
               Sign In
+            </Button>
+            <Button  variant='link'  onClick={onClose}>
+              <Link to="/forgotPassword">Forgot Password?</Link>
             </Button>
           </ModalFooter>
         </ModalContent>

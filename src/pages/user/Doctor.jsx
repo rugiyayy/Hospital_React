@@ -73,7 +73,7 @@ export default function Doctor() {
   const selectedFiltersRedux = useSelector((state) => state.selectedFilters);
 
   const [page, setPage] = useState(1);
-  const [perPage] = useState(2);
+  const [perPage] = useState(10);
 
   //#region //!GET Doctor, DocType, Department
   const getDoctors = () => {
@@ -187,8 +187,8 @@ export default function Doctor() {
 
     return nameMatches && typeMatches && departmentMatches;
   });
-  console.log(filteredData);
-  console.log(doctor.data.doctors);
+  // console.log(filteredData);
+  // console.log(doctor?.data?.doctors);
 
   //#endregion
 
@@ -220,9 +220,8 @@ export default function Doctor() {
     });
   };
   //#endregion
-  
 
-  console.log(department?.data?.departments);
+  console.log(filteredData);
 
   return (
     <main>
@@ -445,7 +444,8 @@ export default function Doctor() {
                         }
                       >
                         <NavLink color={colors.paragraph}>
-                          {doctor.docPhoto?.photoPath != null && (
+                          {doctor?.photoPath !=
+                            null && (
                             <Image
                               padding="20px"
                               objectFit="cover"
@@ -453,11 +453,11 @@ export default function Doctor() {
                               // height="300"
                               width="100%"
                               height="220"
-                              src={`https://localhost:7041/Images/${doctor.docPhoto?.photoPath}`}
+                              src={`https://localhost:7041/Images/${doctor?.photoPath}`}
                               borderRadius="lg"
                             />
                           )}
-                          {doctor.docPhoto?.photoPath == null && (
+                          {doctor?.photoPath == null && (
                             <Image
                               objectFit="cover"
                               width="100%"
