@@ -30,13 +30,10 @@ import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { colors } from "../../components/Constants";
 import { Spinner1 } from "../../components/AppointmentRepetedParts";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CalendarIcon, EmailIcon } from "@chakra-ui/icons";
 
-export default function DoctorListAppointments() {
-  const [isActiveFilter, setIsActiveFilter] = useState(null);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+export default function DoctorTodaysAppList() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
   const location = useLocation();
@@ -76,9 +73,6 @@ export default function DoctorListAppointments() {
     const params = {
       page,
       perPage,
-      isActive: isActiveFilter,
-      startDate: startDate,
-      endDate: endDate,
     };
     const response = await httpClient.get(`/appointment/doctors/${doctorId}`, {
       params,
@@ -92,56 +86,22 @@ export default function DoctorListAppointments() {
     isLoading: appointmentLoading,
     data: appointment,
     error: appointmentError,
-  } = useQuery(
-    ["appointment", isActiveFilter, page, perPage, startDate, endDate],
-    getAppointments,
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
+  } = useQuery(["appointment", page, perPage], getAppointments, {
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    urlParams.set("endDate", endDate);
-    urlParams.set("startDate", startDate);
-    urlParams.set("isActive", isActiveFilter);
     urlParams.set("page", page.toString());
     urlParams.set("perPage", perPage.toString());
 
     navigate(`?${urlParams.toString()}`);
-  }, [isActiveFilter, page, perPage, endDate, startDate, navigate]);
-
-  const handleStartDateChange = (e) => {
-    e.preventDefault();
-    const startDateValue = e.target.value;
-    setStartDate(startDateValue);
-    if (endDate && new Date(startDateValue) > new Date(endDate)) {
-      setEndDate("");
-    }
-  };
-
-  const handleEndDateChange = (e) => {
-    e.preventDefault();
-    setEndDate(e.target.value);
-  };
+  }, [page, perPage, navigate]);
 
   const handlePreviousPage = () => {
     if (page > 1) {
       setPage(page - 1);
     }
-  };
-
-  const handleResetAll = () => {
-    setIsActiveFilter(null);
-    setStartDate("");
-    setEndDate("");
-    setPage(1);
-    setPerPage(5);
-  };
-  const handleReset = () => {
-    setStartDate("");
-    setEndDate("");
-    setPage(1);
   };
 
   const totalAppointments = appointment?.data?.totalCount ?? 0;
@@ -160,6 +120,7 @@ export default function DoctorListAppointments() {
   //   }
 
   console.log(appointment?.totalCount === 0);
+  console.log(appointment?.todaysAppointments);
 
   return (
     <Container mt="1rem" mb="6rem" maxW="72%">
@@ -181,70 +142,9 @@ export default function DoctorListAppointments() {
             borderTop: "4px solid #e12454",
           }}
         >
-          Appointments
+          Todays Appointments
         </Text>
       </Box>
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!
-      <Box>
-        <Button onClick={handleResetAll} colorScheme="red" marginLeft="10px">
-          Reset All filters
-        </Button>
-      </Box>
-      <Box width="20%" margin="0 60px ">
-        <Select
-          value={
-            isActiveFilter === null
-              ? "all"
-              : isActiveFilter
-              ? "active"
-              : "inactive"
-          }
-          onChange={(e) => {
-            setPage(1);
-            const selectedValue = e.target.value;
-            setIsActiveFilter(
-              selectedValue === "all"
-                ? null
-                : selectedValue === "active"
-                ? true
-                : false
-            );
-          }}
-        >
-          <option value="all">All</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </Select>
-      </Box>
-      <InputGroup w="50%" margin="3rem auto">
-        <InputLeftElement pointerEvents="none">
-          <CalendarIcon marginLeft={3} color="gray.600" />
-        </InputLeftElement>
-        <Input
-          borderRadius="20px"
-          type="date"
-          onKeyDown={(e) => e.preventDefault()}
-          placeholder="Start Date"
-          value={startDate}
-          onChange={handleStartDateChange}
-        />
-        <InputLeftElement pointerEvents="none">
-          <CalendarIcon marginLeft={3} color="gray.600" />
-        </InputLeftElement>
-        <Input
-          borderRadius="20px"
-          type="date"
-          placeholder="End Date"
-          onKeyDown={(e) => e.preventDefault()}
-          value={endDate}
-          min={startDate}
-          onChange={handleEndDateChange}
-        />
-      </InputGroup>
-      <Button onClick={handleReset} colorScheme="blue" marginLeft="10px">
-        Reset Date
-      </Button>
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!!
       {appointmentError && (
         <Text
           color={colors.primary}
@@ -270,7 +170,7 @@ export default function DoctorListAppointments() {
             </Tr>
           </Thead>
           <Tbody>
-            {appointment?.appointments?.map((appointment, i) => (
+            {appointment?.todaysAppointments?.map((appointment, i) => (
               <Tr key={appointment?.id}>
                 <Td w="5%">{i + 1 + page * perPage - perPage}</Td>
                 <Td w="20%">{appointment?.patientFullName}</Td>
@@ -290,9 +190,9 @@ export default function DoctorListAppointments() {
                 </Td>
 
                 <Td w="20%" textAlign="center">
-                  {appointment?.formattedStartTime}
+                  {appointment?.startTime}
                 </Td>
-                {/* <Td></Td> */}
+
                 <Td w="30%" textAlign="center">
                   {appointment?.description}
                 </Td>

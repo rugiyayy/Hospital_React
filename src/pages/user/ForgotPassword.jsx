@@ -15,60 +15,70 @@ import forgotPasswordSchema from "../../validations/forgotPasswordSchema";
 import { httpClient } from "../../utils/httpClient";
 import { colors } from "../../components/Constants";
 import { useMutation } from "react-query";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
   const toast = useToast();
+  const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState(false);
+  const location = useLocation();
+  const { userName } = useSelector((state) => state.account);
 
-  const getCode = useMutation(
-    (formData) => httpClient.post("/forgotPassword", formData),
-    {
-      onSuccess: (data) => {
-        const responseData = data.data;
-        toast({
-          title: "Check your email",
-          description: responseData.message,
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-          position: "top-right",
-        });
-        // formik.resetForm();
+  const [loggedIn, setLoggedIn] = useState(true);
 
-        setIsLoading(false);
-      },
-      onError: (error) => {
-        console.log(error);
-        const errorMessage =
-          error.response?.data ||
-          "Something went wrong. Please try again later.";
-        toast({
-          title: "Error",
-          description: errorMessage,
-          status: "error",
-          duration: 4000,
-          isClosable: true,
-          position: "top-right",
-        });
-        setIsLoading(false);
-      },
+  useEffect(() => {
+    if (userName) {
+      setLoggedIn(false);
     }
-  );
-  const onSubmit = (values) => {
-    const formData = {
-      email: values.email,
-    };
-    setIsLoading(true);
-    getCode.mutate(formData);
-  };
-
+  }, [userName]);
+  useEffect(() => {
+    if (!loggedIn) {
+      navigate("/");
+    }
+  }, [loggedIn, navigate]);
   const formik = useFormik({
     initialValues: {
       email: "",
     },
     validationSchema: forgotPasswordSchema,
-    onSubmit: onSubmit,
+    onSubmit: async (values) => {
+      try {
+        setIsLoading(true);
+        const response = await httpClient.get("/Account/forgotPassword", {
+          params: {
+            email: values.email,
+          },
+        });
+
+        navigate(`/resetPassword`);
+
+        toast({
+          title: "Check your email",
+          description: "Reset code sent to your email.",
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      } catch (error) {
+        const errorMessage =
+          error.response?.data ||
+          "Something went wrong. Please try again later.";
+        toast({
+          title: "Error",
+          description: errorMessage || error.message || error || error.response,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
   });
+
   return (
     <Container mt="5rem" w="72%">
       <Text fontWeight="600" fontSize="22px" color={colors.primary} m="2rem 0">
@@ -88,7 +98,7 @@ const ForgotPassword = () => {
         )}
       </FormControl>
       <Button
-        mt="2rem"
+        mt="1rem"
         padding="0 32px "
         isLoading={isLoading}
         onClick={formik.handleSubmit}
@@ -97,7 +107,7 @@ const ForgotPassword = () => {
         color="white"
         _hover={{ bg: "blue.600" }}
       >
-        Send
+        Next
       </Button>
     </Container>
   );

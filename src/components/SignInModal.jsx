@@ -55,6 +55,7 @@ export default function SignInModal(prop) {
               <Input
                 onChange={formik.handleChange}
                 value={formik.values.userName}
+                onBlur={formik.handleBlur}
                 name="userName"
                 type="mail"
                 placeholder="Your Email Address"
@@ -72,6 +73,7 @@ export default function SignInModal(prop) {
                   name="password"
                   onChange={formik.handleChange}
                   value={formik.values.password}
+                  onBlur={formik.handleBlur}
                   pr="4.5rem"
                   type={show ? "text" : "password"}
                   placeholder="Enter password"

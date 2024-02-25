@@ -19,6 +19,9 @@ import {
 import DoctorListAppointments from "./pages/user/DoctorListAppointments";
 import SendEmail from "./pages/SendEmail";
 import ForgotPassword from "./pages/user/ForgotPassword";
+import ResetPassword from "./pages/user/ResetPassword";
+import DoctorTodaysAppList from "./pages/user/DoctorTodaysAppList";
+import SentEmailsList from "./pages/user/SentEmailsList";
 
 function App() {
   return (
@@ -34,8 +37,8 @@ function App() {
             <Route path="/doctors" element={<Doctor />} />
             <Route path="/appointment" element={<Appointment />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
-           
-           
+            <Route path="/resetPassword" element={<ResetPassword />} />
+
             <Route
               path="/appointment-details"
               element={
@@ -61,12 +64,28 @@ function App() {
                 </ProtectedRoute3>
               }
             />
+            <Route
+              path="/docTodaysAppList"
+              element={
+                <ProtectedRoute3>
+                  <DoctorTodaysAppList />
+                </ProtectedRoute3>
+              }
+            />
 
             <Route
               path="/sendEmail"
               element={
                 <ProtectedRoute3>
                   <SendEmail />
+                </ProtectedRoute3>
+              }
+            />
+            <Route
+              path="/sentEmailsList"
+              element={
+                <ProtectedRoute3>
+                  <SentEmailsList/>
                 </ProtectedRoute3>
               }
             />

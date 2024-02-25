@@ -55,6 +55,7 @@ export default function SignUpModal(prop) {
               <Input
                 onChange={formik.handleChange}
                 value={formik.values.fullName}
+                onBlur={formik.handleBlur}
                 name="fullName"
                 type="text"
                 placeholder="Full Name"
@@ -70,6 +71,7 @@ export default function SignUpModal(prop) {
                 <Input
                   onChange={formik.handleChange}
                   value={formik.values.phoneNumber}
+                  onBlur={formik.handleBlur}
                   name="phoneNumber"
                   type="tel"
                   placeholder="Full Name"
@@ -87,6 +89,7 @@ export default function SignUpModal(prop) {
               <Input
                 onChange={formik.handleChange}
                 value={formik.values.email}
+                onBlur={formik.handleBlur}
                 name="email"
                 type="text"
                 placeholder="Email"
@@ -100,6 +103,7 @@ export default function SignUpModal(prop) {
               <Input
                 onChange={formik.handleChange}
                 value={formik.values.patientIdentityNumber}
+                onBlur={formik.handleBlur}
                 name="patientIdentityNumber"
                 type="text"
                 placeholder="patientIdentityNumber"
@@ -116,6 +120,7 @@ export default function SignUpModal(prop) {
               <Input
                 onChange={formik.handleChange}
                 value={formik.values.birthDate}
+                onBlur={formik.handleBlur}
                 name="birthDate"
                 type="date"
                 placeholder="Birth Date"
@@ -133,6 +138,7 @@ export default function SignUpModal(prop) {
                   name="password"
                   onChange={formik.handleChange}
                   value={formik.values.password}
+                  onBlur={formik.handleBlur}
                   pr="4.5rem"
                   type={show ? "text" : "password"}
                   placeholder="Enter password"

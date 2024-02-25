@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { faCommentDots, faUser } from "@fortawesome/free-solid-svg-icons";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import syles from "../assets/styles/header.module.scss";
@@ -12,6 +12,7 @@ import {
   ListItem,
   HStack,
   Button,
+  useToast,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router-dom";
@@ -24,6 +25,23 @@ import SignUpModal from "../components/SignUpModal";
 const Header = () => {
   const { userName, role } = useSelector((x) => x.account);
   const dispatch = useDispatch();
+  const [loggedIn, setLoggedIn] = useState(true);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (!userName) {
+      setLoggedIn(false);
+      toast({
+        title: "Logged Out",
+        description: "You have been logged out.",
+        status: "info",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
+  }, [userName, toast]);
+
   return (
     <header>
       <Box
@@ -181,55 +199,80 @@ const Header = () => {
                 </ListItem>
 
                 {userName && role != "Doctor" && (
-                  <ListItem className={syles.nav_listItem}>
-                    <NavLink
-                      className={({ isActive }) =>
-                        isActive ? syles.active : ""
-                      }
-                      to={"/appList"}
-                    >
-                      Scheduled Appointments
-                    </NavLink>
-                  </ListItem>
-                )}
-                {role !== "Doctor" && (
-                  <ListItem className={syles.nav_listItem}>
-                    <NavLink
-                      className={({ isActive }) =>
-                        isActive ? syles.active : ""
-                      }
-                      to={"/Appointment"}
-                    >
-                      Appointment
-                    </NavLink>
-                  </ListItem>
+                  <>
+                    <ListItem className={syles.nav_listItem}>
+                      <NavLink
+                        className={({ isActive }) =>
+                          isActive ? syles.active : ""
+                        }
+                        to={"/appList"}
+                      >
+                        Scheduled Appointments
+                      </NavLink>
+                    </ListItem>
+
+                    <ListItem className={syles.nav_listItem}>
+                      <NavLink
+                        className={({ isActive }) =>
+                          isActive ? syles.active : ""
+                        }
+                        to={"/Appointment"}
+                      >
+                        Appointment
+                      </NavLink>
+                    </ListItem>
+                  </>
                 )}
 
                 {userName && role === "Doctor" && (
-                  <ListItem className={syles.nav_listItem}>
-                    <NavLink
-                      className={({ isActive }) =>
-                        isActive ? syles.active : ""
-                      }
-                      to={"/docAppList"}
-                    >
-                      All Appointmnets
-                    </NavLink>
-                  </ListItem>
+                  <>
+                    <ListItem className={syles.nav_listItem}>
+                      <NavLink
+                        className={({ isActive }) =>
+                          isActive ? syles.active : ""
+                        }
+                        to={"/docAppList"}
+                      >
+                        All Appointmnets
+                      </NavLink>
+                    </ListItem>
+
+                    <ListItem className={syles.nav_listItem}>
+                      <NavLink
+                        className={({ isActive }) =>
+                          isActive ? syles.active : ""
+                        }
+                        to={"/docTodaysAppList"}
+                      >
+                        Todays Appointmnets
+                      </NavLink>
+                    </ListItem>
+
+                    <ListItem className={syles.nav_listItem}>
+                      <NavLink
+                        className={({ isActive }) =>
+                          isActive ? syles.active : ""
+                        }
+                        to={"/sendEmail"}
+                      >
+                        
+                        Send Email
+                      </NavLink>
+                    </ListItem>
+
+                    <ListItem className={syles.nav_listItem}>
+                      <NavLink
+                        className={({ isActive }) =>
+                          isActive ? syles.active : ""
+                        }
+                        to={"/sentEmailsList"}
+                      >
+                       
+                        Sent Emails
+                      </NavLink>
+                    </ListItem>
+                  </>
                 )}
-                {userName && role === "Doctor" && (
-                  <ListItem className={syles.nav_listItem}>
-                    <NavLink
-                      className={({ isActive }) =>
-                        isActive ? syles.active : ""
-                      }
-                      to={"/sendEmail"}
-                    >
-                      Send Email
-                    </NavLink>
-                  </ListItem>
-                )}
-              
               </List>
             </HStack>
           </Flex>

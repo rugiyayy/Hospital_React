@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate, Route } from "react-router-dom";
 
 function ProtectedRoute({ children }) {
   const { userName } = useSelector((x) => x.account);
@@ -20,4 +20,14 @@ function ProtectedRoute3({ children }) {
   return children;
 }
 
-export { ProtectedRoute, ProtectedRoute2, ProtectedRoute3 };
+const PrivateRoute = ({ element, isAuthenticated, redirectTo, ...props }) => {
+  return (
+    <Route
+      {...props}
+      element={isAuthenticated ? element : <Navigate to={redirectTo} replace />}
+    />
+  );
+};
+
+
+export { ProtectedRoute, ProtectedRoute2, ProtectedRoute3,PrivateRoute };

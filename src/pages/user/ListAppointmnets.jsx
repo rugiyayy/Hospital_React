@@ -43,25 +43,13 @@ export default function ListAppointmnets() {
   useEffect(() => {
     if (!userName) {
       setLoggedIn(false);
-      toast({
-        title: "Logged Out",
-        description: "You have been logged out.",
-        status: "info",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right",
-      });
     }
-
-    
   }, [userName, toast]);
   useEffect(() => {
     if (!loggedIn) {
       navigate("/appointment");
     }
   }, [loggedIn, navigate]);
-
- 
 
   useEffect(() => {
     if (role === "Doctor") {
@@ -124,7 +112,7 @@ export default function ListAppointmnets() {
   if (appointmentLoading) {
     return <Spinner1 />;
   }
-console.log(appointment?.data?.appointments);
+  console.log(appointment?.data?.appointments);
   return (
     <Container maxW="72%">
       <Box>

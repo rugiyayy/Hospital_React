@@ -39,20 +39,22 @@ export default function AppointmentDetails() {
         _hover: {
           bg: colors.primary,
         },
-        transition: ".6s ease",
+        transition: ".2s ease",
         textTransform: "uppercase",
         letterSpacing: "1px",
       },
     },
   });
-  const [loggedIn, setLoggedIn] = useState(true); 
+  const [loggedIn, setLoggedIn] = useState(true);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const doctorId = queryParams.get("doctorId");
   const parsedDoctorId = parseInt(doctorId);
 
   const selectedDate = queryParams.get("selectedDate");
-  const { userName, token, patientId,role } = useSelector((state) => state.account);
+  const { userName, token, patientId, role } = useSelector(
+    (state) => state.account
+  );
   const parsedPatientId = parseInt(patientId);
   const toast = useToast();
   const navigate = useNavigate();
@@ -60,14 +62,6 @@ export default function AppointmentDetails() {
   useEffect(() => {
     if (!userName) {
       setLoggedIn(false);
-      toast({
-        title: "Logged Out",
-        description: "You have been logged out.",
-        status: "info",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right",
-      });
     }
   }, [userName, toast]);
   useEffect(() => {
@@ -88,7 +82,6 @@ export default function AppointmentDetails() {
       });
     }
   }, [role, navigate, toast]);
-
 
   const getDoctorName = async () => {
     const response = await httpClient.get(`/doctor/${parsedDoctorId}`);
@@ -247,12 +240,7 @@ export default function AppointmentDetails() {
               {timeSlotLoading && <p>Loading...</p>} {/* potom napishu */}
               {timeSlotError && <p>Error: {timeSlotError.message}</p>}
             </Flex>
-            <Flex
-              border="1px solid red"
-              width="45%"
-              flexDirection="column"
-              gap="40px"
-            >
+            <Flex width="45%" flexDirection="column" gap="40px">
               <Text>Choose One Available date</Text>
               <FormControl gap="20px">
                 <FormLabel>

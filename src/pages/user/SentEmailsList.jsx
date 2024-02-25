@@ -26,14 +26,14 @@ import {
 
 import React, { useEffect, useState } from "react";
 import { httpClient } from "../../utils/httpClient";
-import { useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSelector } from "react-redux";
 import { colors } from "../../components/Constants";
 import { Spinner1 } from "../../components/AppointmentRepetedParts";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CalendarIcon, EmailIcon } from "@chakra-ui/icons";
 
-export default function DoctorListAppointments() {
+export default function SendedEmailsList() {
   const [isActiveFilter, setIsActiveFilter] = useState(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -41,9 +41,8 @@ export default function DoctorListAppointments() {
   const [perPage, setPerPage] = useState(5);
   const location = useLocation();
   const navigate = useNavigate();
-  const { token, doctorId, userName, role } = useSelector(
-    (state) => state.account
-  );
+  const { token, userName, role } = useSelector((state) => state.account);
+  const queryClient = useQueryClient();
 
   const [loggedIn, setLoggedIn] = useState(true);
   const toast = useToast();
@@ -72,15 +71,12 @@ export default function DoctorListAppointments() {
     }
   }, [role, navigate, toast]);
 
-  const getAppointments = async () => {
+  const getSentEmails = async () => {
     const params = {
       page,
       perPage,
-      isActive: isActiveFilter,
-      startDate: startDate,
-      endDate: endDate,
     };
-    const response = await httpClient.get(`/appointment/doctors/${doctorId}`, {
+    const response = await httpClient.get(`/email/${userName}`, {
       params,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -89,41 +85,58 @@ export default function DoctorListAppointments() {
     return response.data;
   };
   const {
-    isLoading: appointmentLoading,
-    data: appointment,
-    error: appointmentError,
-  } = useQuery(
-    ["appointment", isActiveFilter, page, perPage, startDate, endDate],
-    getAppointments,
+    isLoading,
+    data: email,
+    error: emailError,
+  } = useQuery(["sentEmails", page, perPage], getSentEmails, {
+    refetchOnWindowFocus: false,
+  });
+  const deleteEmail = useMutation(
+    (id) =>
+      httpClient.delete(`/email/soft/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
     {
-      refetchOnWindowFocus: false,
+      onSuccess: () => {
+        toast({
+          title: "Email is deleted",
+          description: "Email has been successfully deleted.",
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      },
+      onError: (error) => {
+        console.error("Error deleting docto account", error);
+        toast({
+          title: "Error",
+          description:
+            error.response?.data ||
+            error.message ||
+            "Something went wrong. Please try again later.",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      },
     }
   );
-
+  useEffect(() => {
+    if (!isLoading && deleteEmail.isSuccess) {
+      queryClient.invalidateQueries("sentEmails");
+    }
+  }, [isLoading, deleteEmail.isSuccess, queryClient]);
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    urlParams.set("endDate", endDate);
-    urlParams.set("startDate", startDate);
-    urlParams.set("isActive", isActiveFilter);
     urlParams.set("page", page.toString());
     urlParams.set("perPage", perPage.toString());
 
     navigate(`?${urlParams.toString()}`);
-  }, [isActiveFilter, page, perPage, endDate, startDate, navigate]);
-
-  const handleStartDateChange = (e) => {
-    e.preventDefault();
-    const startDateValue = e.target.value;
-    setStartDate(startDateValue);
-    if (endDate && new Date(startDateValue) > new Date(endDate)) {
-      setEndDate("");
-    }
-  };
-
-  const handleEndDateChange = (e) => {
-    e.preventDefault();
-    setEndDate(e.target.value);
-  };
+  }, [page, perPage, navigate]);
 
   const handlePreviousPage = () => {
     if (page > 1) {
@@ -131,21 +144,8 @@ export default function DoctorListAppointments() {
     }
   };
 
-  const handleResetAll = () => {
-    setIsActiveFilter(null);
-    setStartDate("");
-    setEndDate("");
-    setPage(1);
-    setPerPage(5);
-  };
-  const handleReset = () => {
-    setStartDate("");
-    setEndDate("");
-    setPage(1);
-  };
-
-  const totalAppointments = appointment?.data?.totalCount ?? 0;
-  const totalPages = Math.ceil(totalAppointments / perPage);
+  const totalEmail = email?.data?.length ?? 0;
+  const totalPages = Math.ceil(totalEmail / perPage);
   const handleNextPage = () => {
     if (page > totalPages) {
       setPage(page + 1);
@@ -158,8 +158,7 @@ export default function DoctorListAppointments() {
   //   if (appointmentLoading) {
   //     return <Spinner1 />;
   //   }
-
-  console.log(appointment?.totalCount === 0);
+  console.log(email?.sentEmails);
 
   return (
     <Container mt="1rem" mb="6rem" maxW="72%">
@@ -181,71 +180,11 @@ export default function DoctorListAppointments() {
             borderTop: "4px solid #e12454",
           }}
         >
-          Appointments
+          Sent emails
         </Text>
       </Box>
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!
-      <Box>
-        <Button onClick={handleResetAll} colorScheme="red" marginLeft="10px">
-          Reset All filters
-        </Button>
-      </Box>
-      <Box width="20%" margin="0 60px ">
-        <Select
-          value={
-            isActiveFilter === null
-              ? "all"
-              : isActiveFilter
-              ? "active"
-              : "inactive"
-          }
-          onChange={(e) => {
-            setPage(1);
-            const selectedValue = e.target.value;
-            setIsActiveFilter(
-              selectedValue === "all"
-                ? null
-                : selectedValue === "active"
-                ? true
-                : false
-            );
-          }}
-        >
-          <option value="all">All</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </Select>
-      </Box>
-      <InputGroup w="50%" margin="3rem auto">
-        <InputLeftElement pointerEvents="none">
-          <CalendarIcon marginLeft={3} color="gray.600" />
-        </InputLeftElement>
-        <Input
-          borderRadius="20px"
-          type="date"
-          onKeyDown={(e) => e.preventDefault()}
-          placeholder="Start Date"
-          value={startDate}
-          onChange={handleStartDateChange}
-        />
-        <InputLeftElement pointerEvents="none">
-          <CalendarIcon marginLeft={3} color="gray.600" />
-        </InputLeftElement>
-        <Input
-          borderRadius="20px"
-          type="date"
-          placeholder="End Date"
-          onKeyDown={(e) => e.preventDefault()}
-          value={endDate}
-          min={startDate}
-          onChange={handleEndDateChange}
-        />
-      </InputGroup>
-      <Button onClick={handleReset} colorScheme="blue" marginLeft="10px">
-        Reset Date
-      </Button>
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      {appointmentError && (
+
+      {emailError && (
         <Text
           color={colors.primary}
           fontWeight="700"
@@ -257,58 +196,55 @@ export default function DoctorListAppointments() {
           Something went wrong , please try again later
         </Text>
       )}
-      {appointment?.appointments?.length > 0 && (
+      {email?.totalCount > 0 && (
         <Table w="100%" variant="simple" margin="50px auto ">
           <Thead>
             <Tr>
               <Th></Th>
-              <Th>Patient Full Name</Th>
-              <Th textAlign="center">Patient Email</Th>
-              <Th textAlign="center">Start Time</Th>
-              <Th textAlign="center">Details</Th>
-              <Th textAlign="end">Status</Th>
+              <Th textAlign="center">To</Th>
+              <Th textAlign="center">Subject</Th>
+              <Th textAlign="center">Message</Th>
+              <Th textAlign="center">Sent Time</Th>
+              <Th textAlign="end"></Th>
             </Tr>
           </Thead>
           <Tbody>
-            {appointment?.appointments?.map((appointment, i) => (
-              <Tr key={appointment?.id}>
+            {email?.sentEmails?.map((email, i) => (
+              <Tr key={email?.id}>
                 <Td w="5%">{i + 1 + page * perPage - perPage}</Td>
-                <Td w="20%">{appointment?.patientFullName}</Td>
                 <Td w="20%">
                   <Box
                     textAlign="center"
                     width="100%"
                     margin="0 auto"
                     as="a"
-                    href={`/sendEmail?to=${appointment?.patientEmail}`}
+                    href={`/sendEmail?to=${email?.to}`}
                   >
                     <Flex flexDirection="column" alignItems="center" gap="12px">
-                      <Text as="p"> {appointment?.patientEmail}</Text>
+                      <Text as="p"> {email?.to}</Text>
                       <EmailIcon color="blue.500" cursor="pointer" />
                     </Flex>
                   </Box>
                 </Td>
 
                 <Td w="20%" textAlign="center">
-                  {appointment?.formattedStartTime}
+                  {email?.subject}
                 </Td>
-                {/* <Td></Td> */}
                 <Td w="30%" textAlign="center">
-                  {appointment?.description}
+                  {email?.body}
                 </Td>
-                <Td
-                  w="5%"
-                  textAlign="end"
-                  fontWeight="700"
-                  color={
-                    appointment?.isActive === true ? "green" : colors.primary
-                  }
-                >
-                  {appointment?.isActive === true
-                    ? "Active"
-                    : appointment?.isActive === false
-                    ? "Inactive"
-                    : "Not specified"}
+
+                <Td w="20%" textAlign="end">
+                  {email?.sentTime}
+                </Td>
+                <Td w="5%" textAlign="end">
+                  <Button
+                    onClick={() => deleteEmail.mutate(email?.id)}
+                    marginLeft="12px"
+                    color="red"
+                  >
+                    Delete
+                  </Button>
                 </Td>
               </Tr>
             ))}
@@ -343,8 +279,7 @@ export default function DoctorListAppointments() {
           }}
           onClick={handleNextPage}
           isDisabled={
-            appointment?.totalCount == perPage ||
-            appointment?.totalCount < perPage * page
+            email?.totalCount == perPage || email?.totalCount < perPage * page
           }
         >
           Next Page
