@@ -11,7 +11,7 @@ const footerData = [
       { label: "React", href: "#" },
       { label: "Community", href: "#" },
       { label: "Digital Garden", href: "#" },
-     
+
       { label: "Digital Garden", href: "#" },
       { label: "Tutorials", href: "#" },
       { label: "React", href: "#" },
@@ -67,7 +67,7 @@ const footerData = [
 
 const Footer = () => {
   return (
-    <Box 
+    <Box
     // background={colors.secondary}
     >
       <Container maxW="80%" padding="5rem 0">
@@ -96,9 +96,9 @@ const Footer = () => {
                       fontSize={{ base: "sm", sm: "md" }}
                       href="#"
                       mr={{ base: 1, sm: 2, md: 0 }}
-                     color="black"
-                     opacity="0.7"
-                      _hover={{ color:colors.primary}}
+                      color="black"
+                      opacity="0.7"
+                      _hover={{ color: colors.primary }}
                     >
                       {link.label}
                     </Link>
@@ -109,7 +109,8 @@ const Footer = () => {
           </Flex>
           <Flex alignItems="center">
             <Text color="gray.500" fontSize="0.875rem" pl="0.5rem">
-              &copy; 2019 company, Inc. All rights reserved.
+              &copy; 2024 company, Inc. All rights reserved.
+              R.Y.E
             </Text>
           </Flex>
         </VStack>

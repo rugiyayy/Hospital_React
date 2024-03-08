@@ -67,6 +67,7 @@ const SingleDoctor = () => {
     keepPreviousData: true,
   });
 
+  console.log(doctor);
   return (
     <main>
       {" "}

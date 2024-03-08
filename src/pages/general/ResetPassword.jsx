@@ -35,14 +35,24 @@ export default function ResetPassword() {
     setShowConfirmPassword(!showConfirmPassword);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const doctorId = queryParams.get("doctorId");
-  const selectedDate = queryParams.get("selectedDate");
-  const parsedDoctorId = parseInt(doctorId);
+  const token = (queryParams.get("token"));
+
+  const email = queryParams.get("email");
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
   const toast = useToast();
 
   const [loggedIn, setLoggedIn] = useState(true);
   const { userName } = useSelector((state) => state.account);
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/forgotPassword');
+    }
+  }, [token, navigate]);
+
+
   useEffect(() => {
     if (userName) {
       setLoggedIn(false);
@@ -55,7 +65,7 @@ export default function ResetPassword() {
   }, [loggedIn, navigate]);
 
   const resetPassword = useMutation(
-    (formData) => httpClient.post("/Account/resetPassword", formData),
+    (formData) => httpClient.post("/Account/ResetPassword", formData),
     {
       onSuccess: () => {
         toast({
@@ -66,20 +76,64 @@ export default function ResetPassword() {
           isClosable: true,
           position: "top-right",
         });
+        setIsLoading(true);
+
         navigate(`/`);
       },
       onError: (error) => {
-        toast({
-          title: "Error",
-          description:
-            error.response?.data ||
-            error.message ||
-            "Something went wrong. Please try again later.",
-          status: "error",
-          duration: 4000,
-          isClosable: true,
-          position: "top-right",
-        });
+        if (
+          error.response &&
+          error.response?.data &&
+          error.response?.data?.errors
+        ) {
+          const validationErrors = error.response.data.errors;
+          const errorMessage = Object.values(validationErrors).join("\v\r\n");
+
+          formik.setErrors(
+            error?.response?.data?.errors ||
+              error?.response?.data ||
+              "Something went wrong. Please try again later."
+          );
+
+          console.log("api validation error:", error?.response?.data?.errors);
+          toast({
+            title: "Error",
+            description:
+              errorMessage || "Something went wrong. Please try again later.",
+            status: "error",
+            duration: 4000,
+            isClosable: true,
+            position: "top-right",
+          });
+        } else if (error?.response?.status === 401) {
+          console.log("error401:", error);
+
+          toast({
+            title: "Authorization Error",
+            description: "You are not authorized",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+            position: "top-right",
+          });
+          console.log(" if eldsfse error message :", error.response);
+        } else {
+          console.log(" if else error message :", error.response);
+
+          toast({
+            title: "Error",
+            description:
+              error?.response?.data ||
+              error?.response ||
+              "An unexpected error occurred. Please try again later.",
+
+            status: "error",
+            duration: 4000,
+            isClosable: true,
+            position: "top-right",
+          });
+        }
+        setIsLoading(false);
       },
     }
   );
@@ -88,10 +142,12 @@ export default function ResetPassword() {
     formik.validateForm().then((errors) => {
       if (Object.keys(errors).length === 0) {
         const formData = {
-          Code: values.code,
+          Email: email,
+          Token: token,
           Password: values.password,
-          confirmPassword: values.confirmPassword,
+          ConfirmPassword: values.confirmPassword,
         };
+        setIsLoading(true);
 
         resetPassword.mutate(formData);
       }
@@ -100,7 +156,6 @@ export default function ResetPassword() {
 
   const formik = useFormik({
     initialValues: {
-      code: "",
       password: "",
       confirmPassword: "",
     },
@@ -108,25 +163,17 @@ export default function ResetPassword() {
     onSubmit: onSubmit,
   });
 
+  console.log(token);
   return (
     <Flex>
       <Container maxW="72%">
         <Box margin="5rem auto">
           <Text
             textAlign="center"
-            fontWeight="700"
-            fontSize="26px"
-            color={colors.secondary}
-            mb="2rem"
-          >
-            Check Your Email Please For Reset Code !
-          </Text>
-          <Text
-            textAlign="center"
             fontWeight="600"
             fontSize="22px"
             color={colors.primary}
-            m="1rem 0"
+            m="3rem 0"
           >
             Reset Password
           </Text>
@@ -135,19 +182,6 @@ export default function ResetPassword() {
             flexDirection="column"
             alignItems="center"
           >
-            <FormControl w="30%" mt={4}>
-              <FormLabel fontWeight="400">Code</FormLabel>
-              <Input
-                onChange={formik.handleChange}
-                value={formik.values.code}
-                onBlur={formik.handleBlur}
-                name="code"
-                type="text"
-              />
-              {formik.errors.code && formik.touched.code && (
-                <span style={{ color: "red" }}>{formik.errors.code}</span>
-              )}
-            </FormControl>
             <FormControl w="30%" mt={4}>
               <FormLabel fontWeight="400">Password</FormLabel>
 

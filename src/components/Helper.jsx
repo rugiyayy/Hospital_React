@@ -1,7 +1,8 @@
-import { Button, extendTheme } from "@chakra-ui/react";
+import { Button, extendTheme, useToast } from "@chakra-ui/react";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 function Helper(props) {
@@ -32,4 +33,27 @@ function Helper(props) {
   );
 }
 
-export { Helper };
+const useAuthentication = (userName) => {
+  const [loggedIn, setLoggedIn] = useState(!!userName);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (!userName) {
+      setLoggedIn(false);
+      toast({
+        title: "Logged Out",
+        description: "You have been logged out.",
+        status: "info",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
+  }, [userName, toast]);
+
+  return loggedIn;
+};
+
+
+
+export { Helper, useAuthentication };

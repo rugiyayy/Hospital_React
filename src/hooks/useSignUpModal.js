@@ -37,7 +37,7 @@ export default function useSignUpModal() {
 
   const registerQuery = async (values) => {
     try {
-      const response = await httpClient.post("/Patient", values, {
+      const response = await httpClient.post("/patient", values, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -58,39 +58,47 @@ export default function useSignUpModal() {
         error.response?.data &&
         error.response?.data?.errors
       ) {
+        const validationErrors = error.response.data.errors;
+        const errorMessage = Object.values(validationErrors).join("\v\r\n");
+
         formik.setErrors(
           error?.response?.data?.errors ||
             error?.response?.data ||
             "Something went wrong. Please try again later."
         );
+
+        console.log("api validation error:", error?.response?.data?.errors);
         toast({
           title: "Error",
           description:
-            error?.response?.data?.errors?.Email ||
-            error?.response?.data?.errors?.Password ||
-            error?.response?.data?.errors?.UserName ||
-            error?.response?.data?.Errors?.IsAdmin ||
-            error?.response?.data?.errors?.FullName ||
-            error?.response?.data ||
-            "Something went wrong. Please try again later.",
+            errorMessage || "Something went wrong. Please try again later.",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      } else if (error?.response?.status === 401) {
+        console.log("error401:", error);
 
+        toast({
+          title: "Authorization Error",
+          description: "You are not authorized",
           status: "error",
           duration: 3000,
           isClosable: true,
           position: "top-right",
         });
+        console.log(" if eldsfse error message :", error.response);
       } else {
+        console.log(" if else error message :", error.response);
+
         toast({
           title: "Error",
           description:
-            error?.response?.data?.errors?.Email ||
-            error?.response?.data?.errors?.Password ||
-            error?.response?.data?.errors?.UserName ||
-            error?.response?.data?.Errors?.IsAdmin ||
-            error?.response?.data?.errors?.FullName ||
             error?.response?.data ||
             error?.response ||
-            "Something went wrong. Please try again later.",
+            "An unexpected error occurred. Please try again later.",
+
           status: "error",
           duration: 4000,
           isClosable: true,

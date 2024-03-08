@@ -32,8 +32,13 @@ export default function SignUpModal(prop) {
     <>
       {" "}
       <Button
+        width={prop.width}
+        fontSize="16px"
+        fontWeight="600"
+        textAlign="center"
         backgroundColor={prop.bg}
         color={prop.color}
+        transition=".3s"
         _hover={{ bg: prop.hoverBg, color: prop.hoverColor }}
         onClick={onOpen}
       >
@@ -43,9 +48,6 @@ export default function SignUpModal(prop) {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader textAlign="center">
-            <Text as="h1" fontSize="28px" fontWeight="bold">
-              Welcome!
-            </Text>{" "}
             <Text as="p">Sign Up </Text>
           </ModalHeader>
           <ModalCloseButton />
@@ -74,7 +76,6 @@ export default function SignUpModal(prop) {
                   onBlur={formik.handleBlur}
                   name="phoneNumber"
                   type="tel"
-                  placeholder="Full Name"
                 />
               </InputGroup>
               {formik.errors.phoneNumber && formik.touched.phoneNumber && (
@@ -106,7 +107,6 @@ export default function SignUpModal(prop) {
                 onBlur={formik.handleBlur}
                 name="patientIdentityNumber"
                 type="text"
-                placeholder="patientIdentityNumber"
               />
               {formik.errors.patientIdentityNumber &&
                 formik.touched.patientIdentityNumber && (
@@ -166,8 +166,6 @@ export default function SignUpModal(prop) {
             >
               Sign Up
             </Button>
-
-            
           </ModalFooter>
         </ModalContent>
       </Modal>

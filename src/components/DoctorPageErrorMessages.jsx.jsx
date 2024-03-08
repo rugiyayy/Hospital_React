@@ -30,7 +30,7 @@ const Errors = ({
 
       {department?.data == null && departmentError == null && departmentLoading}
 
-      {doctor?.data?.length === 0 && <Text as="h1">No doctors ...</Text>}
+      {doctor?.data?.totalCount === 0 && <Text as="h1">No doctors ...</Text>}
 
       {doctor?.data == null && doctorError == null && doctorLoading}
       <Box
@@ -47,7 +47,7 @@ const Errors = ({
           </Text>
         )}
       </Box>
-      {filteredData?.length === 0 && doctor?.length !== 0 && (
+      {filteredData?.length === 0 && doctor?.data?.totalCount !== 0 && (
         <>
           {searchTerm && (
             <Text textAlign="start" as="h1">

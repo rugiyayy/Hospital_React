@@ -49,14 +49,15 @@ export default function AppointmentRepetedParts() {
     },
   });
   return (
-    <Section>
+    <Section zIndex="0">
       <Flex
+        zIndex="-1"
         w="100%"
         justifyContent="center"
         alignItems="center"
         flexDirection="column"
         className={styles.banner}
-        margin="22px 0"
+        margin="2rem 0"
         backgroundColor="#fff"
         bgRepeat="no-repeat"
         bgSize="cover"
@@ -64,7 +65,7 @@ export default function AppointmentRepetedParts() {
         width="100%"
         maxW="100%"
         position="relative"
-        zIndex="100"
+        // zIndex="100"
       >
         <Box
           zIndex="-1"
@@ -83,18 +84,21 @@ export default function AppointmentRepetedParts() {
   );
 }
 
-
 function Spinner1() {
   return (
-    <Box
-    position="absolute"
-    top="280px"
-    left="740px"
-    className={styles.spinner}
-  >
-    <Spinner size="xl" /> <h1>Loading ...</h1>
-  </Box>
-  )
+    <Flex
+      flexDirection="column"
+      gap="8px"
+      justifyContent="center"
+      alignItems="center"
+      // border="2px solid red"
+      margin="4rem 0"
+      padding="4rem "
+      // className={styles.spinner}
+    >
+      <Spinner size="xl" /> <h1>Loading</h1>
+    </Flex>
+  );
 }
 
-export  {Spinner1}
+export { Spinner1 };

@@ -1,27 +1,25 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import SignUp from "./components/SignUp";
-import SignIn from "./components/SignIn";
 
 import Layout from "./layouts/Layouts";
-import Home from "./pages/user/Home";
-import Department from "./pages/user/Department";
-import Doctor from "./pages/user/Doctor";
-import Appointment from "./pages/user/Appointment";
-import AppointmentDetails from "./pages/user/AppointmentDetails";
-import ListAppointmnets from "./pages/user/ListAppointmnets";
-import SingleDoctor from "./pages/user/SingleDoctor";
+import Home from "./pages/general/Home";
+import Department from "./pages/general/Department";
+import Doctor from "./pages/general/Doctor";
+import Appointment from "./pages/general/Appointment";
+import AppointmentDetails from "./pages/patient/AppointmentDetails";
+import ListAppointmnets from "./pages/patient/ListAppointmnets";
+import SingleDoctor from "./pages/doctor/SingleDoctor";
 import {
   ProtectedRoute,
   ProtectedRoute2,
   ProtectedRoute3,
 } from "./utils/ProtectedRoute";
-import DoctorListAppointments from "./pages/user/DoctorListAppointments";
-import SendEmail from "./pages/SendEmail";
-import ForgotPassword from "./pages/user/ForgotPassword";
-import ResetPassword from "./pages/user/ResetPassword";
-import DoctorTodaysAppList from "./pages/user/DoctorTodaysAppList";
-import SentEmailsList from "./pages/user/SentEmailsList";
+import DoctorListAppointments from "./pages/doctor/DoctorListAppointments";
+import SendEmail from "./pages/doctor/SendEmail";
+import ForgotPassword from "./pages/general/ForgotPassword";
+import ResetPassword from "./pages/general/ResetPassword";
+import DoctorTodaysAppList from "./pages/doctor/DoctorTodaysAppList";
+import SentEmailsList from "./pages/doctor/SentEmailsList";
 
 function App() {
   return (
@@ -37,6 +35,8 @@ function App() {
             <Route path="/doctors" element={<Doctor />} />
             <Route path="/appointment" element={<Appointment />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
+
+            {/* //!!problem is here  */}
             <Route path="/resetPassword" element={<ResetPassword />} />
 
             <Route
@@ -85,7 +85,7 @@ function App() {
               path="/sentEmailsList"
               element={
                 <ProtectedRoute3>
-                  <SentEmailsList/>
+                  <SentEmailsList />
                 </ProtectedRoute3>
               }
             />

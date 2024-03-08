@@ -13,6 +13,10 @@ import {
   HStack,
   Button,
   useToast,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router-dom";
@@ -22,25 +26,11 @@ import SignInModal from "../components/SignInModal";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/slices/accountSlice";
 import SignUpModal from "../components/SignUpModal";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+import { colors } from "../components/Constants";
 const Header = () => {
   const { userName, role } = useSelector((x) => x.account);
   const dispatch = useDispatch();
-  const [loggedIn, setLoggedIn] = useState(true);
-  const toast = useToast();
-
-  useEffect(() => {
-    if (!userName) {
-      setLoggedIn(false);
-      toast({
-        title: "Logged Out",
-        description: "You have been logged out.",
-        status: "info",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right",
-      });
-    }
-  }, [userName, toast]);
 
   return (
     <header>
@@ -64,7 +54,7 @@ const Header = () => {
                 <Link
                   alignItems="center"
                   _hover={{ textDecoration: "none" }}
-                  href="mailto:yolchiyeva.y1@gmail.com"
+                  href="mailto:demo1flight@gmail.com"
                   display="flex"
                   gap="10px"
                 >
@@ -75,7 +65,7 @@ const Header = () => {
                     _hover={{ color: "black", transition: " .5s" }}
                   >
                     {" "}
-                    support@novena.com
+                    reyHospital@gmail.com
                   </Text>
                 </Link>
               </ListItem>
@@ -114,11 +104,9 @@ const Header = () => {
                 alignItems="center"
                 gap="8px"
               >
-                <FontAwesomeIcon icon={faUser} />
-
                 {userName ? (
                   <>
-                    {" "}
+                    <FontAwesomeIcon icon={faUser} />
                     {userName}
                     <Button onClick={() => dispatch(logoutAction())}>
                       Log Out
@@ -126,8 +114,39 @@ const Header = () => {
                   </>
                 ) : (
                   <>
-                    <SignInModal name={"Sign In"} />
-                    <SignUpModal name={"Sign Up"} />
+                    <Menu>
+                      <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                        Sign In
+                      </MenuButton>
+                      <MenuList minWidth="150px">
+                        <MenuItem
+                          backgroundColor="white"
+                          _hover={{ backgroundColor: "white" }}
+                          w="100%"
+                        >
+                          <SignUpModal
+                            width="100%"
+                            bg="inherit"
+                            color="black"
+                            hoverColor={colors.primary}
+                            name={"Sign Up"}
+                          />
+                        </MenuItem>
+
+                        <MenuItem
+                          backgroundColor="white"
+                          _hover={{ backgroundColor: "white" }}
+                        >
+                          <SignInModal
+                            width="100%"
+                            bg="inherit"
+                            color="black"
+                            hoverColor={colors.primary}
+                            name={"Sign In"}
+                          />
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
                   </>
                 )}
               </Box>
@@ -198,79 +217,95 @@ const Header = () => {
                   </NavLink>
                 </ListItem>
 
-                {userName && role != "Doctor" && (
-                  <>
-                    <ListItem className={syles.nav_listItem}>
-                      <NavLink
-                        className={({ isActive }) =>
-                          isActive ? syles.active : ""
-                        }
-                        to={"/appList"}
-                      >
-                        Scheduled Appointments
-                      </NavLink>
-                    </ListItem>
-
-                    <ListItem className={syles.nav_listItem}>
-                      <NavLink
-                        className={({ isActive }) =>
-                          isActive ? syles.active : ""
-                        }
-                        to={"/Appointment"}
-                      >
-                        Appointment
-                      </NavLink>
-                    </ListItem>
-                  </>
+                {userName && role === "Patient" && (
+                  <ListItem className={syles.nav_listItem}>
+                    <NavLink
+                      className={({ isActive }) =>
+                        isActive ? syles.active : ""
+                      }
+                      to={"/appList"}
+                    >
+                      Scheduled Appointments
+                    </NavLink>
+                  </ListItem>
                 )}
-
+                {role != "Doctor" && role != "Schdeuler" && role != "Admin" && (
+                  <ListItem className={syles.nav_listItem}>
+                    <NavLink
+                      className={({ isActive }) =>
+                        isActive ? syles.active : ""
+                      }
+                      to={"/Appointment"}
+                    >
+                      Appointment
+                    </NavLink>
+                  </ListItem>
+                )}
                 {userName && role === "Doctor" && (
                   <>
-                    <ListItem className={syles.nav_listItem}>
-                      <NavLink
-                        className={({ isActive }) =>
-                          isActive ? syles.active : ""
-                        }
-                        to={"/docAppList"}
-                      >
-                        All Appointmnets
-                      </NavLink>
-                    </ListItem>
+                    <Menu zIndex={999}>
+                      <MenuButton className={syles.nav_listItem}>
+                        Appointmnets
+                      </MenuButton>
+                      <MenuList margin="8px 0 0 -2rem" minWidth="190px">
+                        <MenuItem>
+                          <ListItem className={syles.nav_listItem}>
+                            <NavLink
+                              className={({ isActive }) =>
+                                isActive ? syles.active : ""
+                              }
+                              to={"/docAppList"}
+                            >
+                              All Appointmnets
+                            </NavLink>
+                          </ListItem>
+                        </MenuItem>
+                        <MenuItem as="a" href="#">
+                          <ListItem className={syles.nav_listItem}>
+                            <NavLink
+                              className={({ isActive }) =>
+                                isActive ? syles.active : ""
+                              }
+                              to={"/docTodaysAppList"}
+                            >
+                              Todays Appointmnets
+                            </NavLink>
+                          </ListItem>
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
 
-                    <ListItem className={syles.nav_listItem}>
-                      <NavLink
-                        className={({ isActive }) =>
-                          isActive ? syles.active : ""
-                        }
-                        to={"/docTodaysAppList"}
-                      >
-                        Todays Appointmnets
-                      </NavLink>
-                    </ListItem>
-
-                    <ListItem className={syles.nav_listItem}>
-                      <NavLink
-                        className={({ isActive }) =>
-                          isActive ? syles.active : ""
-                        }
-                        to={"/sendEmail"}
-                      >
-                        
-                        Send Email
-                      </NavLink>
-                    </ListItem>
-
-                    <ListItem className={syles.nav_listItem}>
-                      <NavLink
-                        className={({ isActive }) =>
-                          isActive ? syles.active : ""
-                        }
-                        to={"/sentEmailsList"}
-                      >
-                       
-                        Sent Emails
-                      </NavLink>
-                    </ListItem>
+                    <Menu zIndex={999}>
+                      <MenuButton className={syles.nav_listItem}>
+                        Email
+                      </MenuButton>
+                      <MenuList minWidth="190px" margin="8px 0 0 -3rem">
+                        <MenuItem>
+                          <ListItem className={syles.nav_listItem}>
+                            <NavLink
+                              className={({ isActive }) =>
+                                isActive ? syles.active : ""
+                              }
+                              to={"/sendEmail"}
+                            >
+                              Send Email
+                            </NavLink>
+                          </ListItem>
+                        </MenuItem>
+                        <MenuItem as="a" href="#">
+                          <ListItem className={syles.nav_listItem}>
+                            <NavLink
+                              className={({ isActive }) =>
+                                isActive ? syles.active : ""
+                              }
+                              to={"/sentEmailsList"}
+                            >
+                              Sent Emails(List)
+                            </NavLink>
+                          </ListItem>
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
                   </>
                 )}
               </List>

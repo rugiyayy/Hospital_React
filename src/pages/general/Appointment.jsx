@@ -143,19 +143,17 @@ function Appointment() {
     refetchOnWindowFocus: false,
   });
 
-  if (doctorLoading) {
-    return <Spinner1 />;
-  }
-
-
 
   return (
     <main>
       <AppointmentRepetedParts />
 
-      <Section>
-        <Container maxW="72%">
-          <Flex padding="4rem 0">
+      <Section  
+    >
+        <Container  
+      maxW="72%">
+          <Flex 
+      padding="4rem 0">
             <Flex flexDirection="column" gap="20px" alignItems="start" w="40%">
               <FontAwesomeIcon
                 fontSize="44px"

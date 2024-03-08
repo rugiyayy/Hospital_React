@@ -31,8 +31,13 @@ export default function SignInModal(prop) {
     <>
       {userName ?? (
         <Button
+          width={prop.width}
+          fontSize="16px"
+          fontWeight="600"
+          textAlign="center"
           backgroundColor={prop.bg}
           color={prop.color}
+          transition=".3s"
           _hover={{ bg: prop.hoverBg, color: prop.hoverColor }}
           onClick={onOpen}
         >
@@ -101,7 +106,7 @@ export default function SignInModal(prop) {
             >
               Sign In
             </Button>
-            <Button  variant='link'  onClick={onClose}>
+            <Button variant="link" onClick={onClose}>
               <Link to="/forgotPassword">Forgot Password?</Link>
             </Button>
           </ModalFooter>

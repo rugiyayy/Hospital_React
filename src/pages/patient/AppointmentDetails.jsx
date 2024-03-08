@@ -140,18 +140,58 @@ export default function AppointmentDetails() {
         navigate(`/appointment`);
       },
       onError: (error) => {
-        console.error("Error creating appointment:", error);
-        toast({
-          title: "Error",
-          description:
-            error.response?.data ||
-            error.message ||
-            "Something went wrong. Please try again later.",
-          status: "error",
-          duration: 4000,
-          isClosable: true,
-          position: "top-right",
-        });
+        if (
+          error.response &&
+          error.response?.data &&
+          error.response?.data?.errors
+        ) {
+          const validationErrors = error.response.data.errors;
+          const errorMessage = Object.values(validationErrors).join("\v\r\n");
+
+          formik.setErrors(
+            error?.response?.data?.errors ||
+              error?.response?.data ||
+              "Something went wrong. Please try again later."
+          );
+
+          console.log("api validation error:", error?.response?.data?.errors);
+          toast({
+            title: "Error",
+            description:
+              errorMessage || "Something went wrong. Please try again later.",
+            status: "error",
+            duration: 4000,
+            isClosable: true,
+            position: "top-right",
+          });
+        } else if (error?.response?.status === 401) {
+          console.log("error401:", error);
+
+          toast({
+            title: "Authorization Error",
+            description: "You are not authorized",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+            position: "top-right",
+          });
+          console.log(" if eldsfse error message :", error.response);
+        } else {
+          console.log(" if else error message :", error.response);
+
+          toast({
+            title: "Error",
+            description:
+              error?.response?.data ||
+              error?.response ||
+              "An unexpected error occurred. Please try again later.",
+
+            status: "error",
+            duration: 4000,
+            isClosable: true,
+            position: "top-right",
+          });
+        }
       },
     }
   );
@@ -195,22 +235,42 @@ export default function AppointmentDetails() {
   return (
     <main>
       <AppointmentRepetedParts />
-      <Container maxW="72%">
-        <Box>
+      <Container mt="1rem" maxW="72%">
+        <Box mb="7rem">
           <Flex w="100%" justifyContent="space-between" alignItems="center">
             <Flex width="45%" flexWrap="wrap" gap="8px">
-              <VStack>
+              <VStack mb="8px">
                 {isDoctorLoading && <p>Loading doctor information...</p>}
                 {doctorError && (
                   <p>
                     Error fetching doctor information: {doctorError.message}
                   </p>
                 )}
-                {doctorData && <Text>{`Doctor: ${doctorData}`}</Text>}
+                {doctorData && (
+                  <Text
+                    fontSize="18px"
+                    fontWeight="600"
+                    color={colors.secondary}
+                  >
+                    Doctor:
+                    <Text padding="0 20px" color={colors.primary} as="span">
+                      {doctorData}
+                    </Text>
+                  </Text>
+                )}
                 {timeSlotLoading && <p>Loading...</p>}
                 {timeSlotError && <p>Error: {timeSlotError.message}</p>}
                 {timeSlot && (
-                  <Text>{`Available time slots for ${selectedDate}:`}</Text>
+                  <Text
+                    fontSize="18px"
+                    fontWeight="600"
+                    color={colors.secondary}
+                  >
+                    Available time slots for
+                    <Text padding="0 20px" color={colors.primary} as="span">
+                      {selectedDate} :
+                    </Text>
+                  </Text>
                 )}
               </VStack>
               <SimpleGrid templateColumns="repeat(4, 4fr)" gap="20px">
@@ -241,28 +301,33 @@ export default function AppointmentDetails() {
               {timeSlotError && <p>Error: {timeSlotError.message}</p>}
             </Flex>
             <Flex width="45%" flexDirection="column" gap="40px">
-              <Text>Choose One Available date</Text>
+
+
               <FormControl gap="20px">
-                <FormLabel>
-                  write about your symptoms or another thing{" "}
-                </FormLabel>
+
+                <FormLabel>Appointment description(details) :</FormLabel>
                 <Textarea
-                  placeholder="checkup..."
+                  placeholder="Checkup..."
                   value={formik.values.description}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   name="description"
                   maxLength={29}
                 />
-                {formik.touched.description && formik.errors.description ? (
-                  <div>{formik.errors.description}</div>
-                ) : null}
+                {formik.touched.description && formik.errors.description && (
+                  <Text color="red">{formik.errors.description}</Text>
+                )}
                 <ButtonGroup margin="20px 0 0">
                   {" "}
                   <Button onClick={() => navigate(`/appointment`)}>
                     Go Back to Previous Page
                   </Button>
-                  <Button onClick={formik.handleSubmit}>
+                  <Button
+                    isDisabled={
+                      selectedTime === null || formik.errors.description
+                    }
+                    onClick={formik.handleSubmit}
+                  >
                     Make Appointment
                   </Button>
                 </ButtonGroup>

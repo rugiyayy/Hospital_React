@@ -51,14 +51,36 @@ export default function useSignInModal() {
         loginAction({ token: response.data, userName: values.userName })
       );
       onClose();
-    } 
-    catch (error) {
+    } catch (error) {
       if (
         error.response &&
         error.response?.data &&
         error.response?.data?.errors
       ) {
         formik.setErrors(error.response?.data?.errors);
+        toast({
+          title: "Error",
+          description:
+            error.response?.data ||
+            error.message ||
+            "Something went wrong. Please try again later.",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      } else if (error?.response?.status === 401) {
+        console.log("error401:", error);
+
+        toast({
+          title: "Authorization Error",
+          description: "You are not authorized || Invalid Credetials",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "top-right",
+        });
+        console.log(" if eldsfse error message :", error.response);
       } else {
         toast({
           title: "Error",
@@ -69,8 +91,7 @@ export default function useSignInModal() {
           position: "top-right",
         });
       }
-    }
-     finally {
+    } finally {
       setIsLoading(false);
     }
   };
